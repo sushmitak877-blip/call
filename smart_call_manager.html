@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Call Manager</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
+
+:root{
+  --bg:#0F0C29;
+  --bg2:#1a1640;
+  --card:#1e1b4b;
+  --card2:#252155;
+  --border:rgba(139,92,246,0.2);
+  --border2:rgba(139,92,246,0.4);
+  --purple:#8B5CF6;
+  --purple2:#7C3AED;
+  --pink:#EC4899;
+  --cyan:#06B6D4;
+  --green:#10B981;
+  --red:#EF4444;
+  --orange:#F59E0B;
+  --text:#F1F0FF;
+  --text2:#A8A0D0;
+  --text3:#6B6490;
+  --shadow:0 25px 50px rgba(0,0,0,0.5);
+  --glow:0 0 40px rgba(139,92,246,0.15);
+}
+
+html{scroll-behavior:smooth;}
+body{background:linear-gradient(135deg,#0F0C29 0%,#302b63 50%,#24243e 100%);min-height:100vh;color:var(--text);overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(139,92,246,0.1),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(236,72,153,0.08),transparent 50%);pointer-events:none;z-index:0;}
+
+/* ── PARTICLES ── */
+.particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.particle{position:absolute;width:2px;height:2px;background:rgba(139,92,246,0.5);border-radius:50%;animation:float linear infinite;}
+@keyframes float{0%{transform:translateY(100vh) scale(0);opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{transform:translateY(-20px) scale(1.5);opacity:0;}}
+
+/* ── WRAPPER ── */
+#root{position:relative;z-index:1;min-height:100vh;}
+
+/* ══════════════════════
+   LOGIN PAGE
+══════════════════════ */
+#loginPage{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+}
+.login-card{
+  background:rgba(30,27,75,0.85);
+  backdrop-filter:blur(20px);
+  border:1px solid var(--border2);
+  border-radius:24px;
+  padding:48px 40px;
+  width:100%;max-width:440px;
+  box-shadow:var(--shadow),var(--glow);
+  animation:slideUp .6s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(32px);}to{opacity:1;transform:translateY(0);}}
+
+.login-logo{text-align:center;margin-bottom:32px;}
+.login-logo .icon-wrap{
+  width:72px;height:72px;border-radius:20px;
+  background:linear-gradient(135deg,var(--purple),var(--pink));
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:32px;margin-bottom:16px;
+  box-shadow:0 8px 32px rgba(139,92,246,0.4);
+}
+.login-logo h1{font-size:24px;font-weight:700;color:var(--text);}
+.login-logo p{font-size:13px;color:var(--text2);margin-top:4px;}
+
+.login-tabs{display:flex;background:var(--bg2);border-radius:12px;padding:4px;margin-bottom:28px;gap:4px;}
+.login-tab{flex:1;padding:8px;border-radius:8px;border:none;background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:.25s;}
+.login-tab.on{background:var(--card2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.3);}
+
+.form-group{margin-bottom:16px;}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;}
+.form-group input{
+  width:100%;padding:12px 16px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid var(--border);
+  border-radius:10px;
+  color:var(--text);font-size:14px;outline:none;
+  transition:.25s;
+}
+.form-group input:focus{border-color:var(--purple);background:rgba(139,92,246,0.08);box-shadow:0 0 0 3px rgba(139,92,246,0.15);}
+.form-group input::placeholder{color:var(--text3);}
+
+.btn-primary{
+  width:100%;padding:13px;border:none;border-radius:12px;
+  background:linear-gradient(135deg,var(--purple),var(--purple2));
+  color:white;font-size:14px;font-weight:600;cursor:pointer;
+  transition:.25s;box-shadow:0 4px 20px rgba(139,92,246,0.4);
+  margin-bottom:12px;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(139,92,246,0.5);}
+.btn-primary:active{transform:translateY(0);}
+
+.divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--text3);font-size:12px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* Google Sign-In Button */
+.btn-google{
+  width:100%;padding:13px;border:1.5px solid rgba(255,255,255,0.15);
+  border-radius:12px;background:rgba(255,255,255,0.06);
+  color:var(--text);font-size:14px;font-weight:500;cursor:pointer;
+  transition:.25s;display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-bottom:8px;
+}
+.btn-google:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.25);transform:translateY(-1px);}
+.google-icon{width:18px;height:18px;flex-shrink:0;}
+
+.btn-github{
+  width:100%;padding:13px;border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:12px;background:rgba(255,255,255,0.04);
+  color:var(--text2);font-size:14px;font-weight:500;cursor:pointer;
+  transition:.25s;display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.btn-github:hover{background:rgba(255,255,255,0.08);transform:translateY(-1px);}
+
+.login-hint{text-align:center;font-size:12px;color:var(--text3);margin-top:20px;line-height:1.5;}
+.login-hint strong{color:var(--purple);cursor:pointer;}
+
+/* Google popup overlay */
+#googlePopup{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);
+  backdrop-filter:blur(8px);z-index:1000;align-items:center;justify-content:center;
+}
+#googlePopup.show{display:flex;}
+.google-modal{
+  background:#fff;border-radius:20px;padding:40px 36px;width:100%;max-width:380px;
+  box-shadow:0 30px 60px rgba(0,0,0,0.5);animation:slideUp .4s cubic-bezier(.22,1,.36,1);
+  text-align:center;
+}
+.google-modal h3{font-size:20px;font-weight:700;color:#111;margin-bottom:4px;}
+.google-modal p{font-size:13px;color:#666;margin-bottom:28px;}
+.goog-logo{font-size:36px;margin-bottom:16px;display:block;}
+.google-accounts{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.g-account{
+  display:flex;align-items:center;gap:12px;padding:12px 16px;border:1.5px solid #e5e7eb;
+  border-radius:12px;cursor:pointer;transition:.2s;text-align:left;background:white;
+}
+.g-account:hover{border-color:#4285f4;background:#f0f7ff;}
+.g-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:white;flex-shrink:0;}
+.g-account-info strong{display:block;font-size:14px;color:#111;font-weight:600;}
+.g-account-info span{font-size:12px;color:#666;}
+.google-modal .cancel-btn{
+  width:100%;padding:10px;border:1.5px solid #e5e7eb;border-radius:10px;
+  background:white;color:#444;font-size:14px;cursor:pointer;transition:.2s;
+}
+.google-modal .cancel-btn:hover{background:#f9f9f9;}
+
+/* ══════════════════════
+   MAIN APP
+══════════════════════ */
+#appPage{display:none;}
+
+/* Sidebar */
+.layout{display:flex;min-height:100vh;}
+.sidebar{
+  width:240px;flex-shrink:0;
+  background:rgba(20,18,60,0.95);
+  backdrop-filter:blur(20px);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  padding:24px 16px;position:sticky;top:0;height:100vh;
+}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:0 8px;margin-bottom:32px;}
+.sidebar-logo .s-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.sidebar-logo span{font-size:15px;font-weight:700;color:var(--text);}
+.sidebar-user{display:flex;align-items:center;gap:10px;padding:10px;background:var(--card2);border-radius:12px;margin-bottom:24px;}
+.user-avatar{width:32px;height:32px;border-radius:50%;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;color:white;flex-shrink:0;}
+.user-info strong{display:block;font-size:12px;color:var(--text);}
+.user-info span{font-size:10px;color:var(--text3);}
+.nav-label{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;padding:0 8px;margin-bottom:8px;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+  font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:.2s;
+  margin-bottom:2px;
+}
+.nav-item:hover{background:rgba(139,92,246,0.12);color:var(--text);}
+.nav-item.active{background:rgba(139,92,246,0.2);color:var(--purple);}
+.nav-item .nav-icon{font-size:16px;width:20px;text-align:center;}
+.nav-badge{margin-left:auto;background:var(--purple);color:white;font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;}
+.sidebar-bottom{margin-top:auto;}
+.sidebar-sep{height:1px;background:var(--border);margin:16px 0;}
+.logout-btn{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;transition:.2s;width:100%;background:transparent;border:none;}
+.logout-btn:hover{background:rgba(239,68,68,0.1);color:var(--red);}
+
+/* Main area */
+.main-area{flex:1;padding:28px 24px;overflow-x:hidden;}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:28px;}
+.stat-card{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:18px;position:relative;overflow:hidden;
+}
+.stat-card::before{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.12;}
+.stat-card.s-purple::before{background:var(--purple);}
+.stat-card.s-green::before{background:var(--green);}
+.stat-card.s-orange::before{background:var(--orange);}
+.stat-card.s-red::before{background:var(--red);}
+.stat-label{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;}
+.stat-value{font-size:28px;font-weight:700;color:var(--text);line-height:1;}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:4px;}
+.stat-icon{position:absolute;top:18px;right:18px;font-size:22px;opacity:.4;}
+
+/* Section header */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.section-title{font-size:18px;font-weight:700;color:var(--text);}
+.section-sub{font-size:13px;color:var(--text2);}
+
+/* Toolbar */
+.toolbar{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:16px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+}
+.tb-group{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.tb-sep{width:1px;height:32px;background:var(--border);flex-shrink:0;}
+
+/* Inputs */
+.tb-input{
+  padding:9px 14px;background:rgba(255,255,255,0.06);
+  border:1px solid var(--border);border-radius:10px;
+  color:var(--text);font-size:13px;outline:none;transition:.2s;
+  min-width:120px;
+}
+.tb-input:focus{border-color:var(--purple);background:rgba(139,92,246,0.08);}
+.tb-input::placeholder{color:var(--text3);}
+select.tb-input option{background:#1e1b4b;color:var(--text);}
+
+/* Buttons */
+.tb-btn{
+  padding:9px 16px;border:none;border-radius:10px;
+  font-size:12px;font-weight:600;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;transition:.2s;white-space:nowrap;
+}
+.tb-btn:hover{transform:translateY(-1px);}
+.tb-btn:active{transform:translateY(0);}
+.tb-btn.upload{background:rgba(139,92,246,0.2);color:#c4b5fd;border:1px solid rgba(139,92,246,0.3);}
+.tb-btn.upload:hover{background:rgba(139,92,246,0.35);}
+.tb-btn.export{background:rgba(6,182,212,0.2);color:#67e8f9;border:1px solid rgba(6,182,212,0.3);}
+.tb-btn.export:hover{background:rgba(6,182,212,0.35);}
+.tb-btn.add{background:rgba(16,185,129,0.2);color:#6ee7b7;border:1px solid rgba(16,185,129,0.3);}
+.tb-btn.add:hover{background:rgba(16,185,129,0.35);}
+.tb-btn.auto-start{background:rgba(245,158,11,0.2);color:#fcd34d;border:1px solid rgba(245,158,11,0.3);}
+.tb-btn.auto-start:hover{background:rgba(245,158,11,0.35);}
+.tb-btn.auto-stop{background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);}
+.tb-btn.auto-stop:hover{background:rgba(239,68,68,0.35);}
+.tb-btn.disconnect{background:rgba(100,116,139,0.2);color:#94a3b8;border:1px solid rgba(100,116,139,0.25);}
+.tb-btn.disconnect:hover{background:rgba(100,116,139,0.35);}
+
+/* Search */
+.search-wrap{position:relative;flex:1;min-width:180px;}
+.search-wrap input{width:100%;padding:9px 14px 9px 36px;}
+.search-wrap .s-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;color:var(--text3);}
+
+/* Table */
+.table-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.tbl-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.tbl-count{font-size:12px;color:var(--text2);}
+.tbl-scroll{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead th{
+  background:rgba(139,92,246,0.12);color:var(--text2);
+  font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  padding:12px 16px;text-align:left;white-space:nowrap;
+  border-bottom:1px solid var(--border);
+}
+thead th:first-child{border-radius:0;}
+tbody tr{border-bottom:1px solid rgba(255,255,255,0.04);transition:.15s;}
+tbody tr:hover{background:rgba(139,92,246,0.06);}
+tbody tr:last-child{border-bottom:none;}
+tbody td{padding:12px 16px;font-size:13px;color:var(--text);}
+.td-avatar{display:flex;align-items:center;gap:10px;}
+.td-avatar .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;}
+.td-name{font-weight:600;}
+.td-phone{color:var(--text2);font-size:12px;}
+.td-info{color:var(--text2);font-size:12px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.td-row-num{color:var(--text3);font-size:12px;font-weight:600;}
+
+/* Status input */
+.status-sel{
+  padding:5px 10px;background:rgba(255,255,255,0.06);
+  border:1px solid var(--border);border-radius:8px;
+  color:var(--text);font-size:12px;outline:none;cursor:pointer;
+  min-width:110px;
+}
+.status-sel option{background:#1e1b4b;}
+
+/* Status badge */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap;}
+.badge-pending{background:rgba(100,116,139,0.2);color:#94a3b8;border:1px solid rgba(100,116,139,0.3);}
+.badge-called{background:rgba(16,185,129,0.2);color:#34d399;border:1px solid rgba(16,185,129,0.3);}
+.badge-callback{background:rgba(245,158,11,0.2);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);}
+.badge-busy{background:rgba(239,68,68,0.2);color:#f87171;border:1px solid rgba(239,68,68,0.3);}
+.badge-noanswer{background:rgba(139,92,246,0.2);color:#a78bfa;border:1px solid rgba(139,92,246,0.3);}
+
+/* Call button in table */
+.call-row-btn{
+  padding:6px 14px;border:none;border-radius:8px;
+  background:rgba(16,185,129,0.2);color:#6ee7b7;border:1px solid rgba(16,185,129,0.3);
+  font-size:11px;font-weight:700;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:5px;
+}
+.call-row-btn:hover{background:rgba(16,185,129,0.4);transform:translateY(-1px);}
+
+/* Delete btn */
+.del-btn{
+  width:28px;height:28px;border:none;border-radius:7px;
+  background:rgba(239,68,68,0.12);color:#f87171;cursor:pointer;
+  font-size:13px;transition:.2s;display:inline-flex;align-items:center;justify-content:center;
+}
+.del-btn:hover{background:rgba(239,68,68,0.3);}
+
+/* Active call banner */
+#callBanner{
+  display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  background:var(--card);border:1px solid rgba(16,185,129,0.4);
+  border-radius:16px;padding:14px 24px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 0 1px rgba(16,185,129,0.2);
+  display:none;align-items:center;gap:16px;z-index:500;min-width:280px;
+}
+#callBanner.show{display:flex;}
+.call-pulse{width:12px;height:12px;border-radius:50%;background:var(--green);animation:pulse 1s ease-in-out infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.6);}50%{box-shadow:0 0 0 8px rgba(16,185,129,0);}}
+.call-banner-info strong{display:block;font-size:14px;color:var(--text);}
+.call-banner-info span{font-size:12px;color:var(--text2);}
+#bannerEndBtn{padding:7px 14px;border:none;border-radius:8px;background:rgba(239,68,68,0.2);color:#fca5a5;font-size:12px;font-weight:700;cursor:pointer;border:1px solid rgba(239,68,68,0.3);transition:.2s;}
+#bannerEndBtn:hover{background:rgba(239,68,68,0.4);}
+
+/* Toast */
+#toast{
+  position:fixed;top:24px;left:50%;transform:translateX(-50%);
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:12px;padding:12px 20px;font-size:13px;font-weight:500;
+  color:var(--text);box-shadow:var(--shadow);z-index:9999;
+  opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;
+}
+#toast.show{opacity:1;}
+
+/* Auto-call progress */
+.auto-progress{
+  display:none;background:var(--card);border:1px solid rgba(245,158,11,0.3);
+  border-radius:12px;padding:12px 16px;margin-bottom:16px;
+  align-items:center;gap:12px;
+}
+.auto-progress.show{display:flex;}
+.progress-bar-wrap{flex:1;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--orange),var(--pink));border-radius:3px;transition:.5s;}
+.auto-info{font-size:12px;color:var(--orange);}
+
+/* Empty state */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3);}
+.empty-state .empty-icon{font-size:48px;display:block;margin-bottom:12px;opacity:.4;}
+.empty-state p{font-size:14px;}
+
+/* Mobile */
+@media(max-width:768px){
+  .sidebar{display:none;}
+  .main-area{padding:16px;}
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<div class="particles" id="particles"></div>
+
+<div id="root">
+
+<!-- ══ LOGIN PAGE ══ -->
+<div id="loginPage">
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="icon-wrap">📞</div>
+      <h1>Smart Call Manager</h1>
+      <p>Professional call tracking & management</p>
+    </div>
+
+    <div class="login-tabs">
+      <button class="login-tab on" onclick="switchTab('signin',this)">Sign In</button>
+      <button class="login-tab" onclick="switchTab('signup',this)">Sign Up</button>
+    </div>
+
+    <!-- Sign In Form -->
+    <div id="signinForm">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="loginEmail" placeholder="admin@company.com" value="admin@company.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="••••••••" value="1234">
+      </div>
+      <button class="btn-primary" onclick="doEmailLogin()">Sign In →</button>
+
+      <div class="divider">or continue with</div>
+
+      <!-- Google Sign In -->
+      <button class="btn-google" onclick="showGooglePopup()">
+        <svg class="google-icon" viewBox="0 0 24 24">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Continue with Google
+      </button>
+
+      <!-- GitHub Sign In -->
+      <button class="btn-github" onclick="doGithubLogin()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
+        </svg>
+        Continue with GitHub
+      </button>
+
+      <p class="login-hint">Demo: admin@company.com / 1234<br>Or use any social login above</p>
+    </div>
+
+    <!-- Sign Up Form -->
+    <div id="signupForm" style="display:none;">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" placeholder="John Doe">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" placeholder="you@company.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" placeholder="Create a password">
+      </div>
+      <button class="btn-primary" onclick="doEmailLogin()">Create Account →</button>
+      <div class="divider">or</div>
+      <button class="btn-google" onclick="showGooglePopup()">
+        <svg class="google-icon" viewBox="0 0 24 24">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+        </svg>
+        Sign up with Google
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ GOOGLE POPUP ══ -->
+<div id="googlePopup">
+  <div class="google-modal">
+    <span class="goog-logo">
+      <svg width="40" height="40" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+    </span>
+    <h3>Sign in with Google</h3>
+    <p>Choose an account to continue to Smart Call Manager</p>
+    <div class="google-accounts">
+      <button class="g-account" onclick="googleLogin('Alex Johnson','alex.johnson@gmail.com','#4285F4','A')">
+        <div class="g-avatar" style="background:#4285F4;">A</div>
+        <div class="g-account-info"><strong>Alex Johnson</strong><span>alex.johnson@gmail.com</span></div>
+      </button>
+      <button class="g-account" onclick="googleLogin('Sarah Manager','sarah.m@workspace.com','#34A853','S')">
+        <div class="g-avatar" style="background:#34A853;">S</div>
+        <div class="g-account-info"><strong>Sarah Manager</strong><span>sarah.m@workspace.com</span></div>
+      </button>
+      <button class="g-account" onclick="googleLogin('Use another account','','#EA4335','＋')">
+        <div class="g-avatar" style="background:#EA4335;">＋</div>
+        <div class="g-account-info"><strong>Use another account</strong><span></span></div>
+      </button>
+    </div>
+    <button class="cancel-btn" onclick="hideGooglePopup()">Cancel</button>
+  </div>
+</div>
+
+<!-- ══ APP PAGE ══ -->
+<div id="appPage">
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="s-icon">📞</div>
+        <span>CallManager</span>
+      </div>
+
+      <div class="sidebar-user">
+        <div class="user-avatar" id="sidebarAvatar" style="background:#8B5CF6;">A</div>
+        <div class="user-info">
+          <strong id="sidebarName">Admin</strong>
+          <span id="sidebarEmail">admin@company.com</span>
+        </div>
+      </div>
+
+      <div class="nav-label">Menu</div>
+      <div class="nav-item active" onclick="setNav(this)">
+        <span class="nav-icon">🏠</span> Dashboard
+        <span class="nav-badge" id="navCount">0</span>
+      </div>
+      <div class="nav-item" onclick="setNav(this)">
+        <span class="nav-icon">📋</span> Call Log
+      </div>
+      <div class="nav-item" onclick="setNav(this)">
+        <span class="nav-icon">📊</span> Analytics
+      </div>
+      <div class="nav-item" onclick="setNav(this)">
+        <span class="nav-icon">⚙️</span> Settings
+      </div>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-sep"></div>
+        <button class="logout-btn" onclick="doLogout()">🚪 Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- MAIN AREA -->
+    <main class="main-area">
+
+      <!-- Stats -->
+      <div class="stats-row" id="statsRow">
+        <div class="stat-card s-purple">
+          <span class="stat-icon">👥</span>
+          <div class="stat-label">Total Contacts</div>
+          <div class="stat-value" id="statTotal">0</div>
+          <div class="stat-sub">In database</div>
+        </div>
+        <div class="stat-card s-green">
+          <span class="stat-icon">✅</span>
+          <div class="stat-label">Called</div>
+          <div class="stat-value" id="statCalled">0</div>
+          <div class="stat-sub">Completed</div>
+        </div>
+        <div class="stat-card s-orange">
+          <span class="stat-icon">⏳</span>
+          <div class="stat-label">Pending</div>
+          <div class="stat-value" id="statPending">0</div>
+          <div class="stat-sub">Not yet called</div>
+        </div>
+        <div class="stat-card s-red">
+          <span class="stat-icon">📞</span>
+          <div class="stat-label">Callbacks</div>
+          <div class="stat-value" id="statCallback">0</div>
+          <div class="stat-sub">Follow up needed</div>
+        </div>
+      </div>
+
+      <!-- Auto call progress -->
+      <div class="auto-progress" id="autoProgress">
+        <span style="font-size:18px;">⚡</span>
+        <div class="auto-info" id="autoInfo">Auto-calling in progress...</div>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="progressBar" style="width:0%"></div>
+        </div>
+        <span class="auto-info" id="autoCountInfo">0/0</span>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="tb-group">
+          <button class="tb-btn upload" onclick="document.getElementById('fileInput').click()">
+            📤 Import Excel
+          </button>
+          <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none">
+          <button class="tb-btn export" onclick="exportExcel()">📥 Export</button>
+        </div>
+
+        <div class="tb-sep"></div>
+
+        <div class="tb-group">
+          <input type="text" class="tb-input" id="name" placeholder="Name" style="width:110px">
+          <input type="text" class="tb-input" id="phone" placeholder="Phone" style="width:130px">
+          <input type="text" class="tb-input" id="info" placeholder="Notes" style="width:120px">
+          <button class="tb-btn add" onclick="addManual()">+ Add</button>
+        </div>
+
+        <div class="tb-sep"></div>
+
+        <div class="tb-group">
+          <select class="tb-input" id="delay" style="width:80px">
+            <option value="5000">5s</option>
+            <option value="10000">10s</option>
+            <option value="15000">15s</option>
+            <option value="30000">30s</option>
+          </select>
+          <button class="tb-btn auto-start" onclick="startAutoCall()">▶ Auto Call</button>
+          <button class="tb-btn auto-stop" onclick="stopAutoCall()">⏹ Stop</button>
+          <button class="tb-btn disconnect" onclick="disconnectCall()">📴 Disconnect</button>
+        </div>
+
+        <div class="tb-sep"></div>
+
+        <div class="search-wrap">
+          <span class="s-icon">🔍</span>
+          <input type="text" class="tb-input" id="searchBox" placeholder="Search contacts..." oninput="render()">
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <div class="tbl-header">
+          <div>
+            <div class="section-title" style="font-size:15px;">Contact List</div>
+            <div class="tbl-count" id="tblCount">0 contacts</div>
+          </div>
+          <select class="tb-input" id="filterStatus" onchange="render()" style="width:140px">
+            <option value="all">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Called">Called</option>
+            <option value="Callback">Callback</option>
+            <option value="Busy">Busy</option>
+            <option value="No Answer">No Answer</option>
+          </select>
+        </div>
+        <div class="tbl-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:40px">#</th>
+                <th>Contact</th>
+                <th>Phone</th>
+                <th>Notes</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+</div><!-- end root -->
+
+<!-- Active call banner -->
+<div id="callBanner">
+  <div class="call-pulse"></div>
+  <div class="call-banner-info">
+    <strong id="bannerName">Calling...</strong>
+    <span id="bannerPhone">--</span>
+  </div>
+  <button id="bannerEndBtn" onclick="disconnectCall()">End Call</button>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+/* ── PARTICLES ── */
+(function(){
+  const wrap=document.getElementById('particles');
+  for(let i=0;i<20;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const left=Math.random()*100;
+    const dur=8+Math.random()*12;
+    const del=Math.random()*10;
+    p.style.cssText=`left:${left}%;animation-duration:${dur}s;animation-delay:${del}s;`;
+    wrap.appendChild(p);
+  }
+})();
+
+/* ── DATA ── */
+let data=JSON.parse(localStorage.getItem('callData'))||[];
+let autoIndex=0;
+let autoRunning=false;
+let autoTimer=null;
+let currentCallName='';
+
+/* ── AUTH ── */
+let currentUser=null;
+
+function switchTab(tab,btn){
+  document.querySelectorAll('.login-tab').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('signinForm').style.display=tab==='signin'?'block':'none';
+  document.getElementById('signupForm').style.display=tab==='signup'?'block':'none';
+}
+
+function doEmailLogin(){
+  const email=document.getElementById('loginEmail')?.value||'admin@company.com';
+  const pass=document.getElementById('loginPass')?.value;
+  if(!email){showToast('❌ Enter email');return;}
+  if(document.getElementById('loginEmail')&&email!=='admin@company.com'){
+    showToast('❌ Wrong credentials');return;
+  }
+  loginSuccess({name:'Admin User',email:'admin@company.com',avatar:'A',avatarColor:'#8B5CF6'});
+}
+
+function showGooglePopup(){
+  document.getElementById('googlePopup').classList.add('show');
+}
+function hideGooglePopup(){
+  document.getElementById('googlePopup').classList.remove('show');
+}
+function googleLogin(name,email,color,initial){
+  if(name==='Use another account'){
+    showToast('ℹ️ Enter your Google email below');
+    hideGooglePopup();
+    return;
+  }
+  hideGooglePopup();
+  loginSuccess({name,email,avatar:initial,avatarColor:color});
+}
+function doGithubLogin(){
+  loginSuccess({name:'GitHub User',email:'user@github.com',avatar:'G',avatarColor:'#333'});
+}
+
+function loginSuccess(user){
+  currentUser=user;
+  document.getElementById('loginPage').style.display='none';
+  document.getElementById('appPage').style.display='block';
+  document.getElementById('sidebarAvatar').textContent=user.avatar;
+  document.getElementById('sidebarAvatar').style.background=user.avatarColor;
+  document.getElementById('sidebarName').textContent=user.name;
+  document.getElementById('sidebarEmail').textContent=user.email;
+  showToast('✅ Welcome, '+user.name+'!');
+  render();
+}
+
+function doLogout(){
+  document.getElementById('appPage').style.display='none';
+  document.getElementById('loginPage').style.display='flex';
+  showToast('👋 Signed out');
+}
+
+function setNav(el){
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ── SAVE ── */
+function saveData(){localStorage.setItem('callData',JSON.stringify(data));}
+
+/* ── RENDER ── */
+function getBadge(status){
+  const map={
+    'Called':'badge-called',
+    'Callback':'badge-callback',
+    'Busy':'badge-busy',
+    'No Answer':'badge-noanswer',
+    'Pending':'badge-pending',
+    '':'badge-pending'
+  };
+  const cls=map[status]||'badge-pending';
+  const label=status||'Pending';
+  const dot={called:'🟢',callback:'🟡',busy:'🔴',noanswer:'🟣',pending:'⚪'}[cls.replace('badge-','')]||'⚪';
+  return`<span class="badge ${cls}">${dot} ${label}</span>`;
+}
+
+function render(){
+  const search=(document.getElementById('searchBox')?.value||'').toLowerCase();
+  const filterSt=document.getElementById('filterStatus')?.value||'all';
+
+  let filtered=data.filter((r,i)=>{
+    const ms=!search||(r.Name||'').toLowerCase().includes(search)||(r.Phone||'').toLowerCase().includes(search)||(r.Info||'').toLowerCase().includes(search);
+    const mf=filterSt==='all'||r.Status===filterSt||(filterSt==='Pending'&&!r.Status);
+    return ms&&mf;
+  });
+
+  const tbody=document.getElementById('tbody');
+  if(!filtered.length){
+    tbody.innerHTML=`<tr><td colspan="6"><div class="empty-state"><span class="empty-icon">📋</span><p>No contacts found. Import an Excel file or add manually above.</p></div></td></tr>`;
+  }else{
+    tbody.innerHTML=filtered.map((row,i)=>{
+      const realIdx=data.indexOf(row);
+      const init=(row.Name||'?').charAt(0).toUpperCase();
+      const colors=['#8B5CF6','#EC4899','#06B6D4','#10B981','#F59E0B','#EF4444'];
+      const col=colors[i%colors.length];
+      return`<tr>
+        <td class="td-row-num">${i+1}</td>
+        <td>
+          <div class="td-avatar">
+            <div class="av" style="background:${col}">${init}</div>
+            <div>
+              <div class="td-name">${row.Name||'—'}</div>
+            </div>
+          </div>
+        </td>
+        <td class="td-phone">${row.Phone||'—'}</td>
+        <td class="td-info" title="${row.Info||''}">${row.Info||'—'}</td>
+        <td>
+          <select class="status-sel" onchange="updateStatus(${realIdx},this.value)">
+            <option value="" ${!row.Status?'selected':''}>Pending</option>
+            <option value="Called" ${row.Status==='Called'?'selected':''}>Called</option>
+            <option value="Callback" ${row.Status==='Callback'?'selected':''}>Callback</option>
+            <option value="Busy" ${row.Status==='Busy'?'selected':''}>Busy</option>
+            <option value="No Answer" ${row.Status==='No Answer'?'selected':''}>No Answer</option>
+          </select>
+        </td>
+        <td>
+          <div style="display:flex;gap:6px;align-items:center;justify-content:center;">
+            <button class="call-row-btn" onclick="callNumber('${row.Phone}','${row.Name||'Contact'}',${realIdx})">📞 Call</button>
+            <button class="del-btn" onclick="deleteRow(${realIdx})" title="Delete">🗑</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  updateStats();
+  document.getElementById('tblCount').textContent=`${filtered.length} of ${data.length} contacts`;
+  document.getElementById('navCount').textContent=data.length;
+  saveData();
+}
+
+/* ── STATS ── */
+function updateStats(){
+  document.getElementById('statTotal').textContent=data.length;
+  document.getElementById('statCalled').textContent=data.filter(r=>r.Status==='Called').length;
+  document.getElementById('statPending').textContent=data.filter(r=>!r.Status||r.Status==='Pending').length;
+  document.getElementById('statCallback').textContent=data.filter(r=>r.Status==='Callback').length;
+}
+
+/* ── ACTIONS ── */
+document.getElementById('fileInput').addEventListener('change',function(e){
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const sheet=wb.Sheets[wb.SheetNames[0]];
+      const json=XLSX.utils.sheet_to_json(sheet);
+      const imported=json.map(r=>({Name:r.Name||r.name||'',Phone:String(r.Phone||r.phone||''),Info:r.Info||r.info||r.Notes||'',Status:''}));
+      data=[...data,...imported];
+      render();
+      showToast('✅ Imported '+imported.length+' contacts');
+    }catch(err){showToast('❌ Invalid file format');}
+  };
+  reader.readAsBinaryString(e.target.files[0]);
+  this.value='';
+});
+
+function addManual(){
+  const n=document.getElementById('name').value.trim();
+  const p=document.getElementById('phone').value.trim();
+  const inf=document.getElementById('info').value.trim();
+  if(!p){showToast('❌ Phone number is required');return;}
+  data.push({Name:n,Phone:p,Info:inf,Status:''});
+  document.getElementById('name').value='';
+  document.getElementById('phone').value='';
+  document.getElementById('info').value='';
+  render();
+  showToast('✅ Contact added');
+}
+
+function updateStatus(i,val){
+  data[i].Status=val;
+  updateStats();
+  saveData();
+}
+
+function deleteRow(i){
+  if(!confirm('Delete this contact?'))return;
+  data.splice(i,1);
+  render();
+  showToast('🗑 Contact deleted');
+}
+
+function callNumber(phone,name,idx){
+  currentCallName=name||phone;
+  document.getElementById('bannerName').textContent='Calling: '+currentCallName;
+  document.getElementById('bannerPhone').textContent=phone;
+  document.getElementById('callBanner').classList.add('show');
+  if(idx!==undefined) data[idx].Status='Called';
+  render();
+  window.location.href='tel:'+phone;
+}
+
+function disconnectCall(){
+  document.getElementById('callBanner').classList.remove('show');
+  showToast('📴 Call ended');
+}
+
+/* ── AUTO CALL ── */
+function startAutoCall(){
+  if(!data.length){showToast('❌ No contacts to call');return;}
+  const uncalled=data.filter(r=>!r.Status||r.Status==='Pending');
+  if(!uncalled.length){showToast('✅ All contacts already called');return;}
+  autoRunning=true;
+  autoIndex=0;
+  document.getElementById('autoProgress').classList.add('show');
+  showToast('▶ Auto-call started');
+  runAuto();
+}
+
+function runAuto(){
+  if(!autoRunning)return;
+  const uncalled=data.reduce((acc,r,i)=>{if(!r.Status||r.Status==='Pending')acc.push(i);return acc;},[]);
+  if(autoIndex>=uncalled.length){
+    stopAutoCall();
+    showToast('✅ Auto-call complete!');
+    return;
+  }
+  const realIdx=uncalled[autoIndex];
+  const row=data[realIdx];
+  const pct=Math.round((autoIndex/uncalled.length)*100);
+  document.getElementById('progressBar').style.width=pct+'%';
+  document.getElementById('autoInfo').textContent='Auto-calling: '+( row.Name||row.Phone);
+  document.getElementById('autoCountInfo').textContent=`${autoIndex+1}/${uncalled.length}`;
+  callNumber(row.Phone,row.Name,realIdx);
+  autoIndex++;
+  autoTimer=setTimeout(runAuto,parseInt(document.getElementById('delay').value));
+}
+
+function stopAutoCall(){
+  autoRunning=false;
+  clearTimeout(autoTimer);
+  document.getElementById('autoProgress').classList.remove('show');
+  document.getElementById('callBanner').classList.remove('show');
+  document.getElementById('progressBar').style.width='0%';
+  showToast('⏹ Auto-call stopped');
+}
+
+/* ── EXPORT ── */
+function exportExcel(){
+  if(!data.length){showToast('❌ No data to export');return;}
+  const ws=XLSX.utils.json_to_sheet(data.map(r=>({Name:r.Name,Phone:r.Phone,Info:r.Info,Status:r.Status||'Pending'})));
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Calls');
+  XLSX.writeFile(wb,'Call_Data_'+new Date().toISOString().slice(0,10)+'.xlsx');
+  showToast('📥 Exported successfully');
+}
+
+/* ── TOAST ── */
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+render();
+</script>
+</body>
+</html>

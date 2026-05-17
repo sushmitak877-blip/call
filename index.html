@@ -3,936 +3,1242 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Smart Call Manager</title>
+<title>Smart Call Manager Pro</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Inter',sans-serif;}
-
+*{margin:0;padding:0;box-sizing:border-box;}
 :root{
-  --bg:#0F0C29;
-  --bg2:#1a1640;
-  --card:#1e1b4b;
-  --card2:#252155;
-  --border:rgba(139,92,246,0.2);
-  --border2:rgba(139,92,246,0.4);
-  --purple:#8B5CF6;
-  --purple2:#7C3AED;
-  --pink:#EC4899;
-  --cyan:#06B6D4;
-  --green:#10B981;
-  --red:#EF4444;
-  --orange:#F59E0B;
-  --text:#F1F0FF;
-  --text2:#A8A0D0;
-  --text3:#6B6490;
-  --shadow:0 25px 50px rgba(0,0,0,0.5);
-  --glow:0 0 40px rgba(139,92,246,0.15);
+  --bg:#070514;--bg2:#0e0b24;--card:#12103a;--card2:#181548;--card3:#1e1c55;
+  --pur:#7c3aed;--pur2:#6d28d9;--pur3:#8b5cf6;
+  --pink:#ec4899;--cyan:#06b6d4;--grn:#10b981;--red:#ef4444;--org:#f59e0b;--blue:#3b82f6;--wa:#25d366;
+  --br:rgba(124,58,237,0.22);--br2:rgba(124,58,237,0.45);
+  --t1:#f0edff;--t2:#a89fd4;--t3:#6b6490;--t4:#3a3660;
+  --r:14px;--rs:8px;--rl:20px;
 }
-
+*{font-family:'Inter',sans-serif;color:var(--t1);}
 html{scroll-behavior:smooth;}
-body{background:linear-gradient(135deg,#0F0C29 0%,#302b63 50%,#24243e 100%);min-height:100vh;color:var(--text);overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(139,92,246,0.1),transparent 50%),radial-gradient(ellipse at 80% 80%,rgba(236,72,153,0.08),transparent 50%);pointer-events:none;z-index:0;}
+body{background:var(--bg);min-height:100vh;overflow-x:hidden;}
 
-/* ── PARTICLES ── */
-.particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
-.particle{position:absolute;width:2px;height:2px;background:rgba(139,92,246,0.5);border-radius:50%;animation:float linear infinite;}
-@keyframes float{0%{transform:translateY(100vh) scale(0);opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{transform:translateY(-20px) scale(1.5);opacity:0;}}
+/* ANIMATED BG */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 15%,rgba(124,58,237,0.12),transparent 60%),
+    radial-gradient(ellipse 50% 40% at 85% 85%,rgba(236,72,153,0.09),transparent 60%),
+    radial-gradient(ellipse 40% 30% at 50% 50%,rgba(6,182,212,0.04),transparent 70%);
+}
 
-/* ── WRAPPER ── */
-#root{position:relative;z-index:1;min-height:100vh;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-thumb{background:rgba(124,58,237,0.4);border-radius:2px;}
+::-webkit-scrollbar-track{background:transparent;}
 
-/* ══════════════════════
-   LOGIN PAGE
-══════════════════════ */
+/* ────────────────────────────
+   PARTICLES
+──────────────────────────── */
+#particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.pt{position:absolute;border-radius:50%;animation:ptup linear infinite;}
+@keyframes ptup{0%{transform:translateY(105vh) scale(0);opacity:0;}8%{opacity:.8;}92%{opacity:.5;}100%{transform:translateY(-50px) scale(1.5);opacity:0;}}
+
+/* ────────────────────────────
+   LOGIN
+──────────────────────────── */
 #loginPage{
-  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:20px;position:relative;z-index:10;
 }
-.login-card{
-  background:rgba(30,27,75,0.85);
-  backdrop-filter:blur(20px);
-  border:1px solid var(--border2);
-  border-radius:24px;
-  padding:48px 40px;
-  width:100%;max-width:440px;
-  box-shadow:var(--shadow),var(--glow);
-  animation:slideUp .6s cubic-bezier(.22,1,.36,1) both;
+.lcard{
+  background:linear-gradient(145deg,rgba(18,16,58,0.95),rgba(14,11,36,0.98));
+  backdrop-filter:blur(28px);border:1px solid var(--br2);
+  border-radius:28px;padding:46px 40px;width:100%;max-width:430px;
+  box-shadow:0 30px 60px rgba(0,0,0,0.7),0 0 60px rgba(124,58,237,0.1);
+  animation:fadeUp .7s cubic-bezier(.22,1,.36,1) both;
+  position:relative;overflow:hidden;
 }
-@keyframes slideUp{from{opacity:0;transform:translateY(32px);}to{opacity:1;transform:translateY(0);}}
-
-.login-logo{text-align:center;margin-bottom:32px;}
-.login-logo .icon-wrap{
-  width:72px;height:72px;border-radius:20px;
-  background:linear-gradient(135deg,var(--purple),var(--pink));
-  display:inline-flex;align-items:center;justify-content:center;
-  font-size:32px;margin-bottom:16px;
-  box-shadow:0 8px 32px rgba(139,92,246,0.4);
+.lcard::before{
+  content:'';position:absolute;top:-60px;right:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(124,58,237,0.18),transparent 70%);
+  pointer-events:none;
 }
-.login-logo h1{font-size:24px;font-weight:700;color:var(--text);}
-.login-logo p{font-size:13px;color:var(--text2);margin-top:4px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
 
-.login-tabs{display:flex;background:var(--bg2);border-radius:12px;padding:4px;margin-bottom:28px;gap:4px;}
-.login-tab{flex:1;padding:8px;border-radius:8px;border:none;background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:.25s;}
-.login-tab.on{background:var(--card2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,0.3);}
-
-.form-group{margin-bottom:16px;}
-.form-group label{display:block;font-size:12px;font-weight:600;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;}
-.form-group input{
-  width:100%;padding:12px 16px;
-  background:rgba(255,255,255,0.06);
-  border:1px solid var(--border);
-  border-radius:10px;
-  color:var(--text);font-size:14px;outline:none;
-  transition:.25s;
+.brand{text-align:center;margin-bottom:32px;}
+.brand-ring{
+  width:72px;height:72px;border-radius:20px;margin:0 auto 14px;
+  background:linear-gradient(135deg,var(--pur),var(--pink));
+  display:flex;align-items:center;justify-content:center;font-size:30px;
+  box-shadow:0 10px 30px rgba(124,58,237,0.5),0 0 0 8px rgba(124,58,237,0.08);
+  animation:glow 3s ease-in-out infinite;
 }
-.form-group input:focus{border-color:var(--purple);background:rgba(139,92,246,0.08);box-shadow:0 0 0 3px rgba(139,92,246,0.15);}
-.form-group input::placeholder{color:var(--text3);}
+@keyframes glow{0%,100%{box-shadow:0 10px 30px rgba(124,58,237,0.5),0 0 0 8px rgba(124,58,237,0.08);}50%{box-shadow:0 10px 40px rgba(124,58,237,0.8),0 0 0 12px rgba(124,58,237,0.12);}}
+.brand h1{font-size:23px;font-weight:900;letter-spacing:-.3px;}
+.brand p{font-size:12px;color:var(--t3);margin-top:3px;}
 
-.btn-primary{
+.tabs{display:flex;background:rgba(255,255,255,0.04);border-radius:10px;padding:3px;margin-bottom:26px;border:1px solid var(--br);}
+.tabBtn{flex:1;padding:8px;border-radius:7px;border:none;background:transparent;color:var(--t3);font-size:12px;font-weight:700;cursor:pointer;transition:.22s;letter-spacing:.3px;}
+.tabBtn.on{background:var(--card3);color:var(--t1);box-shadow:0 2px 12px rgba(0,0,0,.4);}
+
+.fg{margin-bottom:14px;}
+.fg label{display:block;font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px;}
+.fg input{
+  width:100%;padding:12px 14px;
+  background:rgba(255,255,255,0.05);border:1px solid var(--br);
+  border-radius:10px;font-size:14px;outline:none;transition:.22s;
+}
+.fg input:focus{border-color:var(--pur3);background:rgba(124,58,237,0.08);box-shadow:0 0 0 3px rgba(124,58,237,0.15);}
+.fg input::placeholder{color:var(--t4);}
+
+.btnLogin{
   width:100%;padding:13px;border:none;border-radius:12px;
-  background:linear-gradient(135deg,var(--purple),var(--purple2));
-  color:white;font-size:14px;font-weight:600;cursor:pointer;
-  transition:.25s;box-shadow:0 4px 20px rgba(139,92,246,0.4);
-  margin-bottom:12px;
+  background:linear-gradient(135deg,var(--pur),var(--pur2));
+  font-size:14px;font-weight:800;cursor:pointer;
+  transition:.22s;letter-spacing:.3px;
+  box-shadow:0 6px 20px rgba(124,58,237,0.45);margin-bottom:14px;
 }
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(139,92,246,0.5);}
-.btn-primary:active{transform:translateY(0);}
+.btnLogin:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(124,58,237,0.6);}
 
-.divider{display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--text3);font-size:12px;}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.orDiv{display:flex;align-items:center;gap:10px;margin:14px 0;color:var(--t4);font-size:11px;}
+.orDiv::before,.orDiv::after{content:'';flex:1;height:1px;background:var(--br);}
 
-/* Google Sign-In Button */
-.btn-google{
-  width:100%;padding:13px;border:1.5px solid rgba(255,255,255,0.15);
-  border-radius:12px;background:rgba(255,255,255,0.06);
-  color:var(--text);font-size:14px;font-weight:500;cursor:pointer;
-  transition:.25s;display:flex;align-items:center;justify-content:center;gap:10px;
-  margin-bottom:8px;
+.btnGoogle,.btnGithub{
+  width:100%;padding:11px;border-radius:11px;font-size:13px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;
+  transition:.22s;margin-bottom:8px;
 }
-.btn-google:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.25);transform:translateY(-1px);}
-.google-icon{width:18px;height:18px;flex-shrink:0;}
+.btnGoogle{background:rgba(255,255,255,0.06);border:1.5px solid rgba(255,255,255,0.14);}
+.btnGoogle:hover{background:rgba(255,255,255,0.1);transform:translateY(-1px);}
+.btnGithub{background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.08);color:var(--t2);}
+.btnGithub:hover{background:rgba(255,255,255,0.08);transform:translateY(-1px);}
 
-.btn-github{
-  width:100%;padding:13px;border:1.5px solid rgba(255,255,255,0.1);
-  border-radius:12px;background:rgba(255,255,255,0.04);
-  color:var(--text2);font-size:14px;font-weight:500;cursor:pointer;
-  transition:.25s;display:flex;align-items:center;justify-content:center;gap:10px;
-}
-.btn-github:hover{background:rgba(255,255,255,0.08);transform:translateY(-1px);}
+.loginHint{text-align:center;font-size:11px;color:var(--t4);margin-top:18px;line-height:1.7;}
+.loginHint b{color:var(--pur3);}
 
-.login-hint{text-align:center;font-size:12px;color:var(--text3);margin-top:20px;line-height:1.5;}
-.login-hint strong{color:var(--purple);cursor:pointer;}
+/* Google popup */
+#gPop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);z-index:3000;align-items:center;justify-content:center;padding:20px;}
+#gPop.show{display:flex;}
+.gModal{background:#fff;border-radius:22px;padding:36px 30px;width:100%;max-width:360px;box-shadow:0 32px 64px rgba(0,0,0,.6);animation:fadeUp .35s ease;text-align:center;}
+.gModal h3{font-size:18px;font-weight:800;color:#111;margin-bottom:3px;}
+.gModal p{font-size:12px;color:#777;margin-bottom:22px;}
+.gAccs{display:flex;flex-direction:column;gap:7px;margin-bottom:16px;}
+.gAcc{display:flex;align-items:center;gap:10px;padding:11px 13px;border:1.5px solid #e5e7eb;border-radius:11px;cursor:pointer;transition:.2s;background:white;text-align:left;}
+.gAcc:hover{border-color:#4285f4;background:#f0f7ff;}
+.gAv{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:white;flex-shrink:0;}
+.gAcc strong{display:block;font-size:13px;color:#111;font-weight:700;}
+.gAcc span{font-size:11px;color:#888;}
+.gCancel{width:100%;padding:9px;border:1.5px solid #e5e7eb;border-radius:9px;background:white;color:#555;font-size:13px;cursor:pointer;}
+.gCancel:hover{background:#f5f5f5;}
 
-/* Google popup overlay */
-#googlePopup{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);
-  backdrop-filter:blur(8px);z-index:1000;align-items:center;justify-content:center;
-}
-#googlePopup.show{display:flex;}
-.google-modal{
-  background:#fff;border-radius:20px;padding:40px 36px;width:100%;max-width:380px;
-  box-shadow:0 30px 60px rgba(0,0,0,0.5);animation:slideUp .4s cubic-bezier(.22,1,.36,1);
-  text-align:center;
-}
-.google-modal h3{font-size:20px;font-weight:700;color:#111;margin-bottom:4px;}
-.google-modal p{font-size:13px;color:#666;margin-bottom:28px;}
-.goog-logo{font-size:36px;margin-bottom:16px;display:block;}
-.google-accounts{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
-.g-account{
-  display:flex;align-items:center;gap:12px;padding:12px 16px;border:1.5px solid #e5e7eb;
-  border-radius:12px;cursor:pointer;transition:.2s;text-align:left;background:white;
-}
-.g-account:hover{border-color:#4285f4;background:#f0f7ff;}
-.g-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:white;flex-shrink:0;}
-.g-account-info strong{display:block;font-size:14px;color:#111;font-weight:600;}
-.g-account-info span{font-size:12px;color:#666;}
-.google-modal .cancel-btn{
-  width:100%;padding:10px;border:1.5px solid #e5e7eb;border-radius:10px;
-  background:white;color:#444;font-size:14px;cursor:pointer;transition:.2s;
-}
-.google-modal .cancel-btn:hover{background:#f9f9f9;}
-
-/* ══════════════════════
-   MAIN APP
-══════════════════════ */
-#appPage{display:none;}
-
-/* Sidebar */
+/* ────────────────────────────
+   APP
+──────────────────────────── */
+#appPage{display:none;position:relative;z-index:1;}
 .layout{display:flex;min-height:100vh;}
+
+/* SIDEBAR */
 .sidebar{
-  width:240px;flex-shrink:0;
-  background:rgba(20,18,60,0.95);
-  backdrop-filter:blur(20px);
-  border-right:1px solid var(--border);
-  display:flex;flex-direction:column;
-  padding:24px 16px;position:sticky;top:0;height:100vh;
+  width:225px;flex-shrink:0;
+  background:rgba(10,8,32,0.97);backdrop-filter:blur(20px);
+  border-right:1px solid var(--br);
+  display:flex;flex-direction:column;padding:18px 12px;
+  position:sticky;top:0;height:100vh;overflow-y:auto;z-index:50;
+  transition:transform .3s cubic-bezier(.22,1,.36,1);
 }
-.sidebar-logo{display:flex;align-items:center;gap:10px;padding:0 8px;margin-bottom:32px;}
-.sidebar-logo .s-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
-.sidebar-logo span{font-size:15px;font-weight:700;color:var(--text);}
-.sidebar-user{display:flex;align-items:center;gap:10px;padding:10px;background:var(--card2);border-radius:12px;margin-bottom:24px;}
-.user-avatar{width:32px;height:32px;border-radius:50%;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;color:white;flex-shrink:0;}
-.user-info strong{display:block;font-size:12px;color:var(--text);}
-.user-info span{font-size:10px;color:var(--text3);}
-.nav-label{font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;padding:0 8px;margin-bottom:8px;}
-.nav-item{
-  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
-  font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:.2s;
-  margin-bottom:2px;
+.sbLogo{display:flex;align-items:center;gap:9px;padding:0 6px;margin-bottom:24px;}
+.sbIco{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--pur),var(--pink));display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.sbTitle{font-size:14px;font-weight:900;letter-spacing:-.2px;}
+.sbUser{display:flex;align-items:center;gap:8px;padding:8px 9px;background:var(--card2);border-radius:10px;margin-bottom:20px;border:1px solid var(--br);}
+.sbAv{width:28px;height:28px;border-radius:50%;font-size:11px;font-weight:900;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sbUN{font-size:12px;font-weight:700;}
+.sbUE{font-size:9px;color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;}
+.navSec{font-size:9px;font-weight:900;letter-spacing:1.5px;color:var(--t4);text-transform:uppercase;padding:0 6px;margin:8px 0 5px;}
+.navI{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:9px;font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;transition:.2s;margin-bottom:2px;}
+.navI:hover{background:rgba(124,58,237,0.1);color:var(--t1);}
+.navI.on{background:rgba(124,58,237,0.2);color:var(--pur3);}
+.navI .ni{font-size:14px;width:17px;text-align:center;}
+.navBadge{margin-left:auto;background:var(--pur);font-size:9px;font-weight:900;padding:2px 6px;border-radius:20px;}
+.sbSep{height:1px;background:var(--br);margin:12px 0;}
+.sbBot{margin-top:auto;}
+.sbOut{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:9px;font-size:12px;font-weight:600;color:var(--t3);cursor:pointer;transition:.2s;width:100%;background:transparent;border:none;}
+.sbOut:hover{background:rgba(239,68,68,0.1);color:var(--red);}
+
+/* overlay+topbar for mobile */
+.sbOvl{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:49;}
+.sbOvl.show{display:block;}
+.topbar{display:none;background:rgba(10,8,32,.96);border-bottom:1px solid var(--br);padding:10px 14px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:48;}
+@media(max-width:768px){
+  .topbar{display:flex;}
+  .sidebar{position:fixed;top:0;left:0;height:100vh;transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
 }
-.nav-item:hover{background:rgba(139,92,246,0.12);color:var(--text);}
-.nav-item.active{background:rgba(139,92,246,0.2);color:var(--purple);}
-.nav-item .nav-icon{font-size:16px;width:20px;text-align:center;}
-.nav-badge{margin-left:auto;background:var(--purple);color:white;font-size:9px;font-weight:700;padding:2px 6px;border-radius:20px;}
-.sidebar-bottom{margin-top:auto;}
-.sidebar-sep{height:1px;background:var(--border);margin:16px 0;}
-.logout-btn{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;transition:.2s;width:100%;background:transparent;border:none;}
-.logout-btn:hover{background:rgba(239,68,68,0.1);color:var(--red);}
+.topTitle{font-size:14px;font-weight:900;}
+.ham{width:34px;height:34px;border:none;background:rgba(124,58,237,0.15);border-radius:8px;color:var(--pur3);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 
-/* Main area */
-.main-area{flex:1;padding:28px 24px;overflow-x:hidden;}
+/* MAIN */
+.main{flex:1;padding:22px;overflow-x:hidden;min-width:0;}
+@media(max-width:768px){.main{padding:12px;}}
 
-/* Stats row */
-.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:28px;}
-.stat-card{
-  background:var(--card);border:1px solid var(--border);border-radius:16px;
-  padding:18px;position:relative;overflow:hidden;
+/* PAGE */
+.pg{display:none;}
+.pg.on{display:block;}
+
+/* STATS */
+.statRow{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:11px;margin-bottom:20px;}
+.sCard{
+  background:var(--card);border:1px solid var(--br);border-radius:var(--r);
+  padding:15px;position:relative;overflow:hidden;
+  transition:transform .22s,box-shadow .22s;cursor:default;
 }
-.stat-card::before{content:'';position:absolute;top:-20px;right:-20px;width:80px;height:80px;border-radius:50%;opacity:.12;}
-.stat-card.s-purple::before{background:var(--purple);}
-.stat-card.s-green::before{background:var(--green);}
-.stat-card.s-orange::before{background:var(--orange);}
-.stat-card.s-red::before{background:var(--red);}
-.stat-label{font-size:11px;font-weight:600;color:var(--text2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;}
-.stat-value{font-size:28px;font-weight:700;color:var(--text);line-height:1;}
-.stat-sub{font-size:11px;color:var(--text3);margin-top:4px;}
-.stat-icon{position:absolute;top:18px;right:18px;font-size:22px;opacity:.4;}
+.sCard:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(0,0,0,.5);}
+.sCard::after{content:'';position:absolute;top:-25px;right:-25px;width:80px;height:80px;border-radius:50%;opacity:.1;}
+.sCard.sp::after{background:var(--pur3);}
+.sCard.sg::after{background:var(--grn);}
+.sCard.so::after{background:var(--org);}
+.sCard.sr::after{background:var(--red);}
+.sCard.sb::after{background:var(--wa);}
+.sLbl{font-size:10px;font-weight:700;color:var(--t2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px;}
+.sVal{font-size:28px;font-weight:900;line-height:1;}
+.sSub{font-size:10px;color:var(--t3);margin-top:2px;}
+.sIco{position:absolute;top:13px;right:13px;font-size:20px;opacity:.3;}
 
-/* Section header */
-.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
-.section-title{font-size:18px;font-weight:700;color:var(--text);}
-.section-sub{font-size:13px;color:var(--text2);}
-
-/* Toolbar */
+/* TOOLBAR */
 .toolbar{
-  background:var(--card);border:1px solid var(--border);border-radius:16px;
-  padding:16px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+  background:var(--card);border:1px solid var(--br);border-radius:var(--r);
+  padding:13px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;
 }
-.tb-group{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-.tb-sep{width:1px;height:32px;background:var(--border);flex-shrink:0;}
+.tbG{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+.tbSep{width:1px;height:26px;background:var(--br);flex-shrink:0;}
+@media(max-width:600px){.tbSep{display:none;}}
 
-/* Inputs */
-.tb-input{
-  padding:9px 14px;background:rgba(255,255,255,0.06);
-  border:1px solid var(--border);border-radius:10px;
-  color:var(--text);font-size:13px;outline:none;transition:.2s;
-  min-width:120px;
+.ti{
+  padding:8px 11px;background:rgba(255,255,255,0.05);
+  border:1px solid var(--br);border-radius:var(--rs);
+  font-size:12px;outline:none;transition:.2s;min-width:90px;
 }
-.tb-input:focus{border-color:var(--purple);background:rgba(139,92,246,0.08);}
-.tb-input::placeholder{color:var(--text3);}
-select.tb-input option{background:#1e1b4b;color:var(--text);}
+.ti:focus{border-color:var(--pur3);background:rgba(124,58,237,0.08);}
+.ti::placeholder{color:var(--t4);}
+select.ti option{background:#12103a;}
 
-/* Buttons */
-.tb-btn{
-  padding:9px 16px;border:none;border-radius:10px;
-  font-size:12px;font-weight:600;cursor:pointer;
-  display:inline-flex;align-items:center;gap:6px;transition:.2s;white-space:nowrap;
+.tbB{
+  padding:7px 13px;border:none;border-radius:var(--rs);
+  font-size:11px;font-weight:800;cursor:pointer;
+  display:inline-flex;align-items:center;gap:5px;transition:.2s;white-space:nowrap;
+  letter-spacing:.2px;
 }
-.tb-btn:hover{transform:translateY(-1px);}
-.tb-btn:active{transform:translateY(0);}
-.tb-btn.upload{background:rgba(139,92,246,0.2);color:#c4b5fd;border:1px solid rgba(139,92,246,0.3);}
-.tb-btn.upload:hover{background:rgba(139,92,246,0.35);}
-.tb-btn.export{background:rgba(6,182,212,0.2);color:#67e8f9;border:1px solid rgba(6,182,212,0.3);}
-.tb-btn.export:hover{background:rgba(6,182,212,0.35);}
-.tb-btn.add{background:rgba(16,185,129,0.2);color:#6ee7b7;border:1px solid rgba(16,185,129,0.3);}
-.tb-btn.add:hover{background:rgba(16,185,129,0.35);}
-.tb-btn.auto-start{background:rgba(245,158,11,0.2);color:#fcd34d;border:1px solid rgba(245,158,11,0.3);}
-.tb-btn.auto-start:hover{background:rgba(245,158,11,0.35);}
-.tb-btn.auto-stop{background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);}
-.tb-btn.auto-stop:hover{background:rgba(239,68,68,0.35);}
-.tb-btn.disconnect{background:rgba(100,116,139,0.2);color:#94a3b8;border:1px solid rgba(100,116,139,0.25);}
-.tb-btn.disconnect:hover{background:rgba(100,116,139,0.35);}
+.tbB:hover{transform:translateY(-1px);}
+.tbB:active{transform:translateY(0);}
+.bUp{background:rgba(124,58,237,0.18);color:#c4b5fd;border:1px solid rgba(124,58,237,0.32);}
+.bUp:hover{background:rgba(124,58,237,0.35);}
+.bEx{background:rgba(6,182,212,0.15);color:#67e8f9;border:1px solid rgba(6,182,212,0.28);}
+.bEx:hover{background:rgba(6,182,212,0.32);}
+.bAdd{background:rgba(16,185,129,0.15);color:#6ee7b7;border:1px solid rgba(16,185,129,0.28);}
+.bAdd:hover{background:rgba(16,185,129,0.32);}
+.bAuto{background:rgba(245,158,11,0.15);color:#fcd34d;border:1px solid rgba(245,158,11,0.28);}
+.bAuto:hover{background:rgba(245,158,11,0.32);}
+.bStop{background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.28);}
+.bStop:hover{background:rgba(239,68,68,0.32);}
+.bDisc{background:rgba(100,116,139,0.15);color:#94a3b8;border:1px solid rgba(100,116,139,0.22);}
+.bDisc:hover{background:rgba(100,116,139,0.32);}
 
-/* Search */
-.search-wrap{position:relative;flex:1;min-width:180px;}
-.search-wrap input{width:100%;padding:9px 14px 9px 36px;}
-.search-wrap .s-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none;color:var(--text3);}
+.srchW{position:relative;flex:1;min-width:150px;}
+.srchW input{width:100%;padding:8px 11px 8px 30px;}
+.srchIco{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--t4);pointer-events:none;}
 
-/* Table */
-.table-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
-.tbl-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.tbl-count{font-size:12px;color:var(--text2);}
-.tbl-scroll{overflow-x:auto;}
+/* BULK BAR */
+#bulkBar{
+  display:none;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.28);
+  border-radius:var(--rs);padding:8px 12px;margin-bottom:10px;
+  align-items:center;gap:8px;flex-wrap:wrap;
+}
+#bulkBar.show{display:flex;}
+.bkCnt{font-size:12px;font-weight:800;color:#93c5fd;}
+.bkActs{display:flex;gap:6px;flex-wrap:wrap;}
+.bkBtn{padding:5px 11px;border:none;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer;transition:.2s;}
+.bkG{background:rgba(16,185,129,0.2);color:#6ee7b7;border:1px solid rgba(16,185,129,0.3);}
+.bkO{background:rgba(245,158,11,0.2);color:#fcd34d;border:1px solid rgba(245,158,11,0.3);}
+.bkR{background:rgba(239,68,68,0.2);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);}
+.bkX{background:rgba(100,116,139,0.12);color:#94a3b8;border:1px solid rgba(100,116,139,0.2);}
+
+/* TABLE */
+.tWrap{background:var(--card);border:1px solid var(--br);border-radius:var(--r);overflow:hidden;}
+.tHead{padding:11px 16px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;}
+.tCnt{font-size:11px;color:var(--t2);}
+.tScroll{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;}
-thead th{
-  background:rgba(139,92,246,0.12);color:var(--text2);
-  font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
-  padding:12px 16px;text-align:left;white-space:nowrap;
-  border-bottom:1px solid var(--border);
-}
-thead th:first-child{border-radius:0;}
-tbody tr{border-bottom:1px solid rgba(255,255,255,0.04);transition:.15s;}
-tbody tr:hover{background:rgba(139,92,246,0.06);}
+thead th{background:rgba(124,58,237,0.1);color:var(--t2);font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:10px 12px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--br);}
+tbody tr{border-bottom:1px solid rgba(255,255,255,0.025);transition:.15s;}
+tbody tr:hover{background:rgba(124,58,237,0.055);}
+tbody tr.sel{background:rgba(59,130,246,0.07);}
 tbody tr:last-child{border-bottom:none;}
-tbody td{padding:12px 16px;font-size:13px;color:var(--text);}
-.td-avatar{display:flex;align-items:center;gap:10px;}
-.td-avatar .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--pink));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0;}
-.td-name{font-weight:600;}
-.td-phone{color:var(--text2);font-size:12px;}
-.td-info{color:var(--text2);font-size:12px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.td-row-num{color:var(--text3);font-size:12px;font-weight:600;}
+td{padding:10px 12px;font-size:12px;vertical-align:middle;}
+.tdAv{display:flex;align-items:center;gap:8px;}
+.av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0;}
+.tdN{font-weight:700;font-size:12px;}
+.tdP{color:var(--t2);font-size:11px;margin-top:1px;}
+.tdI{color:var(--t3);font-size:11px;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.tdNum{color:var(--t4);font-size:11px;font-weight:800;}
 
-/* Status input */
-.status-sel{
-  padding:5px 10px;background:rgba(255,255,255,0.06);
-  border:1px solid var(--border);border-radius:8px;
-  color:var(--text);font-size:12px;outline:none;cursor:pointer;
-  min-width:110px;
+.stSel{
+  padding:5px 8px;background:rgba(255,255,255,0.05);
+  border:1px solid var(--br);border-radius:7px;
+  font-size:11px;outline:none;cursor:pointer;min-width:100px;
 }
-.status-sel option{background:#1e1b4b;}
+.stSel option{background:#12103a;}
 
-/* Status badge */
-.badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap;}
-.badge-pending{background:rgba(100,116,139,0.2);color:#94a3b8;border:1px solid rgba(100,116,139,0.3);}
-.badge-called{background:rgba(16,185,129,0.2);color:#34d399;border:1px solid rgba(16,185,129,0.3);}
-.badge-callback{background:rgba(245,158,11,0.2);color:#fbbf24;border:1px solid rgba(245,158,11,0.3);}
-.badge-busy{background:rgba(239,68,68,0.2);color:#f87171;border:1px solid rgba(239,68,68,0.3);}
-.badge-noanswer{background:rgba(139,92,246,0.2);color:#a78bfa;border:1px solid rgba(139,92,246,0.3);}
+.rActs{display:flex;gap:4px;align-items:center;}
 
-/* Call button in table */
-.call-row-btn{
-  padding:6px 14px;border:none;border-radius:8px;
-  background:rgba(16,185,129,0.2);color:#6ee7b7;border:1px solid rgba(16,185,129,0.3);
-  font-size:11px;font-weight:700;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:5px;
+/* ROW BUTTONS */
+.rBtn{
+  padding:5px 9px;border:none;border-radius:6px;
+  font-size:10px;font-weight:800;cursor:pointer;transition:.2s;
+  display:inline-flex;align-items:center;gap:3px;white-space:nowrap;
 }
-.call-row-btn:hover{background:rgba(16,185,129,0.4);transform:translateY(-1px);}
+.rBtn:hover{transform:translateY(-1px);}
+.callBtn{background:rgba(16,185,129,0.18);color:#6ee7b7;border:1px solid rgba(16,185,129,0.3);}
+.callBtn:hover{background:rgba(16,185,129,0.38);}
+.waBtn{background:rgba(37,211,102,0.18);color:#4ade80;border:1px solid rgba(37,211,102,0.35);}
+.waBtn:hover{background:rgba(37,211,102,0.38);}
+.editBtn{width:25px;height:25px;border:none;border-radius:6px;background:rgba(59,130,246,0.14);color:#93c5fd;cursor:pointer;font-size:11px;transition:.2s;display:inline-flex;align-items:center;justify-content:center;}
+.editBtn:hover{background:rgba(59,130,246,0.3);}
+.delBtn{width:25px;height:25px;border:none;border-radius:6px;background:rgba(239,68,68,0.12);color:#f87171;cursor:pointer;font-size:11px;transition:.2s;display:inline-flex;align-items:center;justify-content:center;}
+.delBtn:hover{background:rgba(239,68,68,0.3);}
 
-/* Delete btn */
-.del-btn{
-  width:28px;height:28px;border:none;border-radius:7px;
-  background:rgba(239,68,68,0.12);color:#f87171;cursor:pointer;
-  font-size:13px;transition:.2s;display:inline-flex;align-items:center;justify-content:center;
+/* AUTO PROGRESS */
+.autoProg{
+  display:none;background:var(--card);border:1px solid rgba(245,158,11,0.3);
+  border-radius:var(--rs);padding:10px 13px;margin-bottom:12px;
+  align-items:center;gap:9px;
 }
-.del-btn:hover{background:rgba(239,68,68,0.3);}
+.autoProg.show{display:flex;}
+.progWrap{flex:1;height:5px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;}
+.progBar{height:100%;background:linear-gradient(90deg,var(--org),var(--pink));border-radius:3px;transition:.5s;}
+.progInfo{font-size:11px;color:var(--org);white-space:nowrap;}
 
-/* Active call banner */
+/* EMPTY */
+.empty{text-align:center;padding:50px 20px;color:var(--t3);}
+.emIco{font-size:42px;display:block;margin-bottom:10px;opacity:.3;}
+
+/* CALL BANNER */
 #callBanner{
-  display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-  background:var(--card);border:1px solid rgba(16,185,129,0.4);
-  border-radius:16px;padding:14px 24px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 0 1px rgba(16,185,129,0.2);
-  display:none;align-items:center;gap:16px;z-index:500;min-width:280px;
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:rgba(12,10,36,0.97);border:1px solid rgba(16,185,129,0.45);
+  border-radius:16px;padding:12px 20px;
+  box-shadow:0 10px 36px rgba(0,0,0,.7),0 0 0 1px rgba(16,185,129,0.15),0 0 35px rgba(16,185,129,0.08);
+  display:none;align-items:center;gap:13px;z-index:500;min-width:260px;
+  animation:fadeUp .35s ease;
 }
 #callBanner.show{display:flex;}
-.call-pulse{width:12px;height:12px;border-radius:50%;background:var(--green);animation:pulse 1s ease-in-out infinite;}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.6);}50%{box-shadow:0 0 0 8px rgba(16,185,129,0);}}
-.call-banner-info strong{display:block;font-size:14px;color:var(--text);}
-.call-banner-info span{font-size:12px;color:var(--text2);}
-#bannerEndBtn{padding:7px 14px;border:none;border-radius:8px;background:rgba(239,68,68,0.2);color:#fca5a5;font-size:12px;font-weight:700;cursor:pointer;border:1px solid rgba(239,68,68,0.3);transition:.2s;}
-#bannerEndBtn:hover{background:rgba(239,68,68,0.4);}
+.pulse{width:10px;height:10px;border-radius:50%;background:var(--grn);flex-shrink:0;animation:cp 1.1s ease-in-out infinite;}
+@keyframes cp{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,0.7);}50%{box-shadow:0 0 0 9px rgba(16,185,129,0);}}
+.cbInfo{flex:1;}
+.cbN{display:block;font-size:13px;font-weight:800;}
+.cbP{font-size:11px;color:var(--t2);}
+.cbT{font-size:13px;font-weight:900;color:var(--grn);font-variant-numeric:tabular-nums;min-width:38px;}
+.cbEnd{padding:6px 12px;border:none;border-radius:8px;background:rgba(239,68,68,0.22);color:#fca5a5;font-size:11px;font-weight:800;cursor:pointer;border:1px solid rgba(239,68,68,0.35);transition:.2s;}
+.cbEnd:hover{background:rgba(239,68,68,0.4);}
 
-/* Toast */
+/* EDIT MODAL */
+#editModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:2000;align-items:center;justify-content:center;padding:20px;}
+#editModal.show{display:flex;}
+.eCard{
+  background:linear-gradient(145deg,rgba(18,16,58,0.97),rgba(14,11,36,0.99));
+  border:1px solid var(--br2);border-radius:22px;padding:28px 26px;
+  width:100%;max-width:400px;box-shadow:0 30px 60px rgba(0,0,0,.7);animation:fadeUp .35s ease;
+}
+.eHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.eHead h3{font-size:16px;font-weight:900;}
+.eClose{width:27px;height:27px;border:none;background:rgba(255,255,255,0.06);border-radius:7px;color:var(--t2);cursor:pointer;font-size:13px;transition:.2s;}
+.eClose:hover{background:rgba(255,255,255,0.12);}
+.efg{margin-bottom:12px;}
+.efg label{display:block;font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.6px;text-transform:uppercase;margin-bottom:4px;}
+.efg input,.efg select,.efg textarea{
+  width:100%;padding:10px 12px;
+  background:rgba(255,255,255,0.05);border:1px solid var(--br);
+  border-radius:9px;font-size:13px;outline:none;transition:.2s;
+}
+.efg input:focus,.efg select:focus,.efg textarea:focus{border-color:var(--pur3);background:rgba(124,58,237,0.08);}
+.efg textarea{resize:vertical;min-height:65px;font-family:'Inter',sans-serif;}
+.efg select option{background:#12103a;}
+.eSave{
+  width:100%;padding:11px;border:none;border-radius:10px;
+  background:linear-gradient(135deg,var(--pur),var(--pur2));
+  font-size:13px;font-weight:800;cursor:pointer;
+  box-shadow:0 4px 16px rgba(124,58,237,0.38);margin-top:4px;transition:.22s;
+}
+.eSave:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(124,58,237,0.5);}
+
+/* ANALYTICS */
+.anaGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:13px;}
+.anaCard{background:var(--card);border:1px solid var(--br);border-radius:var(--r);padding:16px;}
+.anaTitle{font-size:11px;font-weight:800;color:var(--t2);letter-spacing:.5px;text-transform:uppercase;margin-bottom:12px;}
+.bcRow{display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+.bcLbl{font-size:11px;color:var(--t2);width:72px;flex-shrink:0;}
+.bcTrack{flex:1;height:7px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden;}
+.bcFill{height:100%;border-radius:4px;transition:width .9s ease;}
+.bcPct{font-size:10px;color:var(--t3);width:30px;text-align:right;flex-shrink:0;}
+.donutW{display:flex;align-items:center;gap:14px;}
+.donutLeg{display:flex;flex-direction:column;gap:5px;flex:1;}
+.dLItem{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--t2);}
+.dDot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.dPct{margin-left:auto;font-weight:800;color:var(--t1);}
+.tlItem{display:flex;align-items:center;gap:9px;padding:7px 9px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:6px;}
+.tlDot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.tlNm{font-size:12px;font-weight:600;}
+.tlTm{font-size:10px;color:var(--t3);}
+.tlSt{font-size:10px;font-weight:800;margin-left:auto;}
+
+/* LOG PAGE */
+.logWrap{background:var(--card);border:1px solid var(--br);border-radius:var(--r);overflow:hidden;}
+
+/* TOAST */
 #toast{
-  position:fixed;top:24px;left:50%;transform:translateX(-50%);
-  background:var(--card);border:1px solid var(--border2);
-  border-radius:12px;padding:12px 20px;font-size:13px;font-weight:500;
-  color:var(--text);box-shadow:var(--shadow);z-index:9999;
-  opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;
+  position:fixed;top:18px;left:50%;transform:translateX(-50%);
+  background:var(--card);border:1px solid var(--br2);
+  border-radius:11px;padding:10px 16px;font-size:12px;font-weight:700;
+  box-shadow:0 24px 48px rgba(0,0,0,.7);z-index:9999;
+  opacity:0;transition:opacity .28s;pointer-events:none;
+  max-width:90vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
 #toast.show{opacity:1;}
 
-/* Auto-call progress */
-.auto-progress{
-  display:none;background:var(--card);border:1px solid rgba(245,158,11,0.3);
-  border-radius:12px;padding:12px 16px;margin-bottom:16px;
-  align-items:center;gap:12px;
-}
-.auto-progress.show{display:flex;}
-.progress-bar-wrap{flex:1;height:6px;background:rgba(255,255,255,0.1);border-radius:3px;overflow:hidden;}
-.progress-bar{height:100%;background:linear-gradient(90deg,var(--orange),var(--pink));border-radius:3px;transition:.5s;}
-.auto-info{font-size:12px;color:var(--orange);}
-
-/* Empty state */
-.empty-state{text-align:center;padding:60px 20px;color:var(--text3);}
-.empty-state .empty-icon{font-size:48px;display:block;margin-bottom:12px;opacity:.4;}
-.empty-state p{font-size:14px;}
-
-/* Mobile */
-@media(max-width:768px){
-  .sidebar{display:none;}
-  .main-area{padding:16px;}
-  .stats-row{grid-template-columns:repeat(2,1fr);}
+/* MEDIA */
+@media(max-width:600px){
+  .statRow{grid-template-columns:1fr 1fr;}
+  .anaGrid{grid-template-columns:1fr;}
+  .rBtn .rBtnTxt{display:none;}
 }
 </style>
 </head>
 <body>
 
-<div class="particles" id="particles"></div>
+<div id="particles"></div>
 
-<div id="root">
-
-<!-- ══ LOGIN PAGE ══ -->
+<!-- ══════════════ LOGIN ══════════════ -->
 <div id="loginPage">
-  <div class="login-card">
-    <div class="login-logo">
-      <div class="icon-wrap">📞</div>
-      <h1>Smart Call Manager</h1>
-      <p>Professional call tracking & management</p>
-    </div>
+<div class="lcard">
+  <div class="brand">
+    <div class="brand-ring">📞</div>
+    <h1>Smart Call Manager</h1>
+    <p>Professional call tracking & WhatsApp automation</p>
+  </div>
 
-    <div class="login-tabs">
-      <button class="login-tab on" onclick="switchTab('signin',this)">Sign In</button>
-      <button class="login-tab" onclick="switchTab('signup',this)">Sign Up</button>
-    </div>
+  <div class="tabs">
+    <button class="tabBtn on" onclick="switchTab('si',this)">Sign In</button>
+    <button class="tabBtn" onclick="switchTab('su',this)">Sign Up</button>
+  </div>
 
-    <!-- Sign In Form -->
-    <div id="signinForm">
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="loginEmail" placeholder="admin@company.com" value="admin@company.com">
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="loginPass" placeholder="••••••••" value="1234">
-      </div>
-      <button class="btn-primary" onclick="doEmailLogin()">Sign In →</button>
+  <div id="siF">
+    <div class="fg"><label>Email</label>
+      <input type="email" id="liE" placeholder="admin@company.com" value="admin@company.com"></div>
+    <div class="fg"><label>Password</label>
+      <input type="password" id="liP" placeholder="••••••••" value="1234"></div>
+    <button class="btnLogin" onclick="doEmailLogin()">Sign In →</button>
+    <div class="orDiv">or continue with</div>
+    <button class="btnGoogle" onclick="showGPop()">
+      <svg width="17" height="17" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      Continue with Google
+    </button>
+    <button class="btnGithub" onclick="doGithubLogin()">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/></svg>
+      Continue with GitHub
+    </button>
+    <p class="loginHint">Demo: <b>admin@company.com</b> / <b>1234</b><br>Data is saved per account in browser storage</p>
+  </div>
 
-      <div class="divider">or continue with</div>
-
-      <!-- Google Sign In -->
-      <button class="btn-google" onclick="showGooglePopup()">
-        <svg class="google-icon" viewBox="0 0 24 24">
-          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-        </svg>
-        Continue with Google
-      </button>
-
-      <!-- GitHub Sign In -->
-      <button class="btn-github" onclick="doGithubLogin()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
-        </svg>
-        Continue with GitHub
-      </button>
-
-      <p class="login-hint">Demo: admin@company.com / 1234<br>Or use any social login above</p>
-    </div>
-
-    <!-- Sign Up Form -->
-    <div id="signupForm" style="display:none;">
-      <div class="form-group">
-        <label>Full Name</label>
-        <input type="text" placeholder="John Doe">
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" placeholder="you@company.com">
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" placeholder="Create a password">
-      </div>
-      <button class="btn-primary" onclick="doEmailLogin()">Create Account →</button>
-      <div class="divider">or</div>
-      <button class="btn-google" onclick="showGooglePopup()">
-        <svg class="google-icon" viewBox="0 0 24 24">
-          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-        </svg>
-        Sign up with Google
-      </button>
-    </div>
+  <div id="suF" style="display:none">
+    <div class="fg"><label>Full Name</label><input type="text" id="suN" placeholder="Your Name"></div>
+    <div class="fg"><label>Email</label><input type="email" id="suE" placeholder="you@company.com"></div>
+    <div class="fg"><label>Password</label><input type="password" placeholder="Create password"></div>
+    <button class="btnLogin" onclick="doSignUp()">Create Account →</button>
+    <div class="orDiv">or</div>
+    <button class="btnGoogle" onclick="showGPop()">
+      <svg width="17" height="17" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+      Sign up with Google
+    </button>
   </div>
 </div>
+</div>
 
-<!-- ══ GOOGLE POPUP ══ -->
-<div id="googlePopup">
-  <div class="google-modal">
-    <span class="goog-logo">
-      <svg width="40" height="40" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-    </span>
+<!-- Google popup -->
+<div id="gPop">
+  <div class="gModal">
+    <svg width="36" height="36" viewBox="0 0 24 24" style="margin-bottom:12px"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
     <h3>Sign in with Google</h3>
     <p>Choose an account to continue to Smart Call Manager</p>
-    <div class="google-accounts">
-      <button class="g-account" onclick="googleLogin('Alex Johnson','alex.johnson@gmail.com','#4285F4','A')">
-        <div class="g-avatar" style="background:#4285F4;">A</div>
-        <div class="g-account-info"><strong>Alex Johnson</strong><span>alex.johnson@gmail.com</span></div>
+    <div class="gAccs">
+      <button class="gAcc" onclick="gLogin('Alex Johnson','alex.j@gmail.com','#4285F4','A')">
+        <div class="gAv" style="background:#4285F4">A</div>
+        <div><strong>Alex Johnson</strong><span>alex.j@gmail.com</span></div>
       </button>
-      <button class="g-account" onclick="googleLogin('Sarah Manager','sarah.m@workspace.com','#34A853','S')">
-        <div class="g-avatar" style="background:#34A853;">S</div>
-        <div class="g-account-info"><strong>Sarah Manager</strong><span>sarah.m@workspace.com</span></div>
+      <button class="gAcc" onclick="gLogin('Sarah Manager','sarah@workspace.com','#34A853','S')">
+        <div class="gAv" style="background:#34A853">S</div>
+        <div><strong>Sarah Manager</strong><span>sarah@workspace.com</span></div>
       </button>
-      <button class="g-account" onclick="googleLogin('Use another account','','#EA4335','＋')">
-        <div class="g-avatar" style="background:#EA4335;">＋</div>
-        <div class="g-account-info"><strong>Use another account</strong><span></span></div>
+      <button class="gAcc" onclick="gLogin('','','#EA4335','＋')">
+        <div class="gAv" style="background:#EA4335">＋</div>
+        <div><strong>Use another account</strong><span></span></div>
       </button>
     </div>
-    <button class="cancel-btn" onclick="hideGooglePopup()">Cancel</button>
+    <button class="gCancel" onclick="hideGPop()">Cancel</button>
   </div>
 </div>
 
-<!-- ══ APP PAGE ══ -->
+<!-- ══════════════ APP ══════════════ -->
 <div id="appPage">
-  <div class="layout">
+<div class="topbar">
+  <span class="topTitle">📞 CallManager</span>
+  <button class="ham" onclick="togSB()">☰</button>
+</div>
+<div class="sbOvl" id="sbOvl" onclick="togSB()"></div>
 
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      <div class="sidebar-logo">
-        <div class="s-icon">📞</div>
-        <span>CallManager</span>
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sb">
+    <div class="sbLogo">
+      <div class="sbIco">📞</div>
+      <span class="sbTitle">CallManager</span>
+    </div>
+    <div class="sbUser">
+      <div class="sbAv" id="sbAv" style="background:var(--pur)">A</div>
+      <div>
+        <div class="sbUN" id="sbUN">Admin</div>
+        <div class="sbUE" id="sbUE">admin@company.com</div>
       </div>
+    </div>
+    <div class="navSec">Navigation</div>
+    <div class="navI on" onclick="showPg('dash',this)"><span class="ni">🏠</span>Dashboard<span class="navBadge" id="navB">0</span></div>
+    <div class="navI" onclick="showPg('ana',this)"><span class="ni">📊</span>Analytics</div>
+    <div class="navI" onclick="showPg('log',this)"><span class="ni">📋</span>Call Log</div>
+    <div class="sbSep"></div>
+    <div class="sbBot">
+      <button class="sbOut" onclick="doLogout()">🚪 Sign Out</button>
+    </div>
+  </aside>
 
-      <div class="sidebar-user">
-        <div class="user-avatar" id="sidebarAvatar" style="background:#8B5CF6;">A</div>
-        <div class="user-info">
-          <strong id="sidebarName">Admin</strong>
-          <span id="sidebarEmail">admin@company.com</span>
-        </div>
-      </div>
+  <!-- MAIN -->
+  <main class="main">
 
-      <div class="nav-label">Menu</div>
-      <div class="nav-item active" onclick="setNav(this)">
-        <span class="nav-icon">🏠</span> Dashboard
-        <span class="nav-badge" id="navCount">0</span>
-      </div>
-      <div class="nav-item" onclick="setNav(this)">
-        <span class="nav-icon">📋</span> Call Log
-      </div>
-      <div class="nav-item" onclick="setNav(this)">
-        <span class="nav-icon">📊</span> Analytics
-      </div>
-      <div class="nav-item" onclick="setNav(this)">
-        <span class="nav-icon">⚙️</span> Settings
-      </div>
-
-      <div class="sidebar-bottom">
-        <div class="sidebar-sep"></div>
-        <button class="logout-btn" onclick="doLogout()">🚪 Sign Out</button>
-      </div>
-    </aside>
-
-    <!-- MAIN AREA -->
-    <main class="main-area">
-
-      <!-- Stats -->
-      <div class="stats-row" id="statsRow">
-        <div class="stat-card s-purple">
-          <span class="stat-icon">👥</span>
-          <div class="stat-label">Total Contacts</div>
-          <div class="stat-value" id="statTotal">0</div>
-          <div class="stat-sub">In database</div>
-        </div>
-        <div class="stat-card s-green">
-          <span class="stat-icon">✅</span>
-          <div class="stat-label">Called</div>
-          <div class="stat-value" id="statCalled">0</div>
-          <div class="stat-sub">Completed</div>
-        </div>
-        <div class="stat-card s-orange">
-          <span class="stat-icon">⏳</span>
-          <div class="stat-label">Pending</div>
-          <div class="stat-value" id="statPending">0</div>
-          <div class="stat-sub">Not yet called</div>
-        </div>
-        <div class="stat-card s-red">
-          <span class="stat-icon">📞</span>
-          <div class="stat-label">Callbacks</div>
-          <div class="stat-value" id="statCallback">0</div>
-          <div class="stat-sub">Follow up needed</div>
-        </div>
+    <!-- DASHBOARD -->
+    <div class="pg on" id="pg-dash">
+      <div class="statRow">
+        <div class="sCard sp"><span class="sIco">👥</span><div class="sLbl">Total</div><div class="sVal" id="stT">0</div><div class="sSub">Contacts</div></div>
+        <div class="sCard sg"><span class="sIco">✅</span><div class="sLbl">Called</div><div class="sVal" id="stC">0</div><div class="sSub">Completed</div></div>
+        <div class="sCard so"><span class="sIco">⏳</span><div class="sLbl">Pending</div><div class="sVal" id="stP">0</div><div class="sSub">Not called</div></div>
+        <div class="sCard sr"><span class="sIco">🔄</span><div class="sLbl">Callback</div><div class="sVal" id="stCB">0</div><div class="sSub">Follow up</div></div>
+        <div class="sCard sb"><span class="sIco">💬</span><div class="sLbl">WhatsApp</div><div class="sVal" id="stWA">0</div><div class="sSub">Messages sent</div></div>
       </div>
 
-      <!-- Auto call progress -->
-      <div class="auto-progress" id="autoProgress">
-        <span style="font-size:18px;">⚡</span>
-        <div class="auto-info" id="autoInfo">Auto-calling in progress...</div>
-        <div class="progress-bar-wrap">
-          <div class="progress-bar" id="progressBar" style="width:0%"></div>
-        </div>
-        <span class="auto-info" id="autoCountInfo">0/0</span>
+      <!-- Auto progress -->
+      <div class="autoProg" id="autoProg">
+        <span>⚡</span>
+        <div class="progInfo" id="progInfo">Auto-calling...</div>
+        <div class="progWrap"><div class="progBar" id="progBar" style="width:0%"></div></div>
+        <span class="progInfo" id="progCnt">0/0</span>
       </div>
 
       <!-- Toolbar -->
       <div class="toolbar">
-        <div class="tb-group">
-          <button class="tb-btn upload" onclick="document.getElementById('fileInput').click()">
-            📤 Import Excel
-          </button>
-          <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none">
-          <button class="tb-btn export" onclick="exportExcel()">📥 Export</button>
+        <div class="tbG">
+          <button class="tbB bUp" onclick="document.getElementById('fileIn').click()">📤 Import</button>
+          <input type="file" id="fileIn" accept=".xlsx,.xls,.csv,.pdf" style="display:none">
+          <button class="tbB bEx" onclick="exportXL()">📥 Export</button>
         </div>
-
-        <div class="tb-sep"></div>
-
-        <div class="tb-group">
-          <input type="text" class="tb-input" id="name" placeholder="Name" style="width:110px">
-          <input type="text" class="tb-input" id="phone" placeholder="Phone" style="width:130px">
-          <input type="text" class="tb-input" id="info" placeholder="Notes" style="width:120px">
-          <button class="tb-btn add" onclick="addManual()">+ Add</button>
+        <div class="tbSep"></div>
+        <div class="tbG">
+          <input type="text" class="ti" id="fN" placeholder="Name" style="width:90px">
+          <input type="text" class="ti" id="fPh" placeholder="Phone" style="width:115px">
+          <input type="text" class="ti" id="fIn" placeholder="Notes" style="width:100px">
+          <button class="tbB bAdd" onclick="addRow()">＋ Add</button>
         </div>
-
-        <div class="tb-sep"></div>
-
-        <div class="tb-group">
-          <select class="tb-input" id="delay" style="width:80px">
+        <div class="tbSep"></div>
+        <div class="tbG">
+          <select class="ti" id="delSel" style="width:64px">
             <option value="5000">5s</option>
             <option value="10000">10s</option>
             <option value="15000">15s</option>
             <option value="30000">30s</option>
           </select>
-          <button class="tb-btn auto-start" onclick="startAutoCall()">▶ Auto Call</button>
-          <button class="tb-btn auto-stop" onclick="stopAutoCall()">⏹ Stop</button>
-          <button class="tb-btn disconnect" onclick="disconnectCall()">📴 Disconnect</button>
+          <button class="tbB bAuto" onclick="startAuto()">▶ Auto</button>
+          <button class="tbB bStop" onclick="stopAuto()">⏹ Stop</button>
+          <button class="tbB bDisc" onclick="endCall()">📴 End</button>
         </div>
+        <div class="tbSep"></div>
+        <div class="srchW">
+          <span class="srchIco">🔍</span>
+          <input type="text" class="ti" id="srch" placeholder="Search..." oninput="render()">
+        </div>
+      </div>
 
-        <div class="tb-sep"></div>
+      <!-- WA message row -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap;">
+        <input type="text" class="ti" id="waMsg" placeholder="WhatsApp message for bulk send..." style="flex:1;min-width:200px;">
+        <button class="tbB" style="background:rgba(37,211,102,0.18);color:#4ade80;border:1px solid rgba(37,211,102,0.35);" onclick="bulkWA()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          WhatsApp Bulk Send
+        </button>
+      </div>
 
-        <div class="search-wrap">
-          <span class="s-icon">🔍</span>
-          <input type="text" class="tb-input" id="searchBox" placeholder="Search contacts..." oninput="render()">
+      <!-- Bulk bar -->
+      <div id="bulkBar">
+        <span class="bkCnt" id="bkCnt">0 selected</span>
+        <div class="bkActs">
+          <button class="bkBtn bkG" onclick="bulkSt('Called')">✅ Called</button>
+          <button class="bkBtn bkO" onclick="bulkSt('Callback')">🔄 Callback</button>
+          <button class="bkBtn" style="background:rgba(37,211,102,0.18);color:#4ade80;border:1px solid rgba(37,211,102,0.3);" onclick="bulkWASel()">💬 WhatsApp Selected</button>
+          <button class="bkBtn bkR" onclick="bulkDel()">🗑 Delete</button>
+          <button class="bkBtn bkX" onclick="clrSel()">✕ Clear</button>
         </div>
       </div>
 
       <!-- Table -->
-      <div class="table-wrap">
-        <div class="tbl-header">
+      <div class="tWrap">
+        <div class="tHead">
           <div>
-            <div class="section-title" style="font-size:15px;">Contact List</div>
-            <div class="tbl-count" id="tblCount">0 contacts</div>
+            <div style="font-size:14px;font-weight:900;">Contact List</div>
+            <div class="tCnt" id="tCnt">0 contacts</div>
           </div>
-          <select class="tb-input" id="filterStatus" onchange="render()" style="width:140px">
-            <option value="all">All Status</option>
-            <option value="Pending">Pending</option>
-            <option value="Called">Called</option>
-            <option value="Callback">Callback</option>
-            <option value="Busy">Busy</option>
-            <option value="No Answer">No Answer</option>
-          </select>
+          <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;">
+            <select class="ti" id="stF" onchange="render()" style="width:120px">
+              <option value="all">All Status</option>
+              <option value="Pending">Pending</option>
+              <option value="Called">Called</option>
+              <option value="Callback">Callback</option>
+              <option value="Busy">Busy</option>
+              <option value="No Answer">No Answer</option>
+            </select>
+            <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2);cursor:pointer;">
+              <input type="checkbox" id="selAll" onchange="togAll()" style="accent-color:var(--pur);"> All
+            </label>
+          </div>
         </div>
-        <div class="tbl-scroll">
+        <div class="tScroll">
           <table>
             <thead>
               <tr>
-                <th style="width:40px">#</th>
+                <th style="width:34px">☐</th>
+                <th>#</th>
                 <th>Contact</th>
                 <th>Phone</th>
                 <th>Notes</th>
                 <th>Status</th>
-                <th>Action</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody id="tbody"></tbody>
           </table>
         </div>
       </div>
+    </div><!-- /dash -->
 
-    </main>
-  </div>
+    <!-- ANALYTICS -->
+    <div class="pg" id="pg-ana">
+      <div style="font-size:16px;font-weight:900;margin-bottom:16px;">📊 Analytics</div>
+      <div class="anaGrid" id="anaGrid"></div>
+    </div>
+
+    <!-- CALL LOG -->
+    <div class="pg" id="pg-log">
+      <div style="font-size:16px;font-weight:900;margin-bottom:16px;">📋 Call Log</div>
+      <div class="logWrap">
+        <div class="tScroll">
+          <table>
+            <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Action</th><th>Time</th></tr></thead>
+            <tbody id="logBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
 </div>
 
-</div><!-- end root -->
-
-<!-- Active call banner -->
+<!-- Call banner -->
 <div id="callBanner">
-  <div class="call-pulse"></div>
-  <div class="call-banner-info">
-    <strong id="bannerName">Calling...</strong>
-    <span id="bannerPhone">--</span>
+  <div class="pulse"></div>
+  <div class="cbInfo">
+    <strong class="cbN" id="cbN">Calling…</strong>
+    <span class="cbP" id="cbP">--</span>
   </div>
-  <button id="bannerEndBtn" onclick="disconnectCall()">End Call</button>
+  <span class="cbT" id="cbT">0:00</span>
+  <button class="cbEnd" onclick="endCall()">End</button>
 </div>
 
-<!-- Toast -->
+<!-- Edit modal -->
+<div id="editModal">
+  <div class="eCard">
+    <div class="eHead"><h3>✏️ Edit Contact</h3><button class="eClose" onclick="closeEdit()">✕</button></div>
+    <div class="efg"><label>Name</label><input type="text" id="eN"></div>
+    <div class="efg"><label>Phone</label><input type="text" id="ePh"></div>
+    <div class="efg"><label>Notes</label><textarea id="eIn" rows="3"></textarea></div>
+    <div class="efg"><label>Status</label>
+      <select id="eSt">
+        <option value="">Pending</option>
+        <option value="Called">Called</option>
+        <option value="Callback">Callback</option>
+        <option value="Busy">Busy</option>
+        <option value="No Answer">No Answer</option>
+      </select>
+    </div>
+    <button class="eSave" onclick="saveEdit()">💾 Save Changes</button>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
-/* ── PARTICLES ── */
+/* ──────────────────────────
+   PARTICLES
+────────────────────────── */
 (function(){
-  const wrap=document.getElementById('particles');
-  for(let i=0;i<20;i++){
-    const p=document.createElement('div');
-    p.className='particle';
-    const left=Math.random()*100;
-    const dur=8+Math.random()*12;
-    const del=Math.random()*10;
-    p.style.cssText=`left:${left}%;animation-duration:${dur}s;animation-delay:${del}s;`;
-    wrap.appendChild(p);
+  const w=document.getElementById('particles');
+  const cols=['rgba(124,58,237,0.6)','rgba(236,72,153,0.45)','rgba(6,182,212,0.45)','rgba(245,158,11,0.4)','rgba(16,185,129,0.4)'];
+  for(let i=0;i<28;i++){
+    const p=document.createElement('div');p.className='pt';
+    const sz=1.5+Math.random()*2.5;
+    p.style.cssText=`left:${Math.random()*100}%;width:${sz}px;height:${sz}px;background:${cols[i%cols.length]};animation-duration:${10+Math.random()*14}s;animation-delay:${Math.random()*12}s;`;
+    w.appendChild(p);
   }
 })();
 
-/* ── DATA ── */
-let data=JSON.parse(localStorage.getItem('callData'))||[];
-let autoIndex=0;
-let autoRunning=false;
-let autoTimer=null;
-let currentCallName='';
+/* ──────────────────────────
+   MULTI-USER DATA (per email key)
+────────────────────────── */
+let CU=null; // current user object
+function userKey(k){return 'scm_'+CU.email+'_'+k;}
+function loadUD(){
+  return JSON.parse(localStorage.getItem(userKey('data')))||[];
+}
+function loadLog(){
+  return JSON.parse(localStorage.getItem(userKey('log')))||[];
+}
+function loadWACount(){
+  return parseInt(localStorage.getItem(userKey('waCount'))||'0');
+}
+function saveUD(){localStorage.setItem(userKey('data'),JSON.stringify(DATA));}
+function saveLog(){localStorage.setItem(userKey('log'),JSON.stringify(CLOG));}
+function saveWA(){localStorage.setItem(userKey('waCount'),WA_COUNT);}
 
-/* ── AUTH ── */
-let currentUser=null;
+let DATA=[];
+let CLOG=[];
+let WA_COUNT=0;
+let SEL=new Set();
+let autoRunning=false,autoIdx=0,autoTmr=null;
+let callTmrInt=null,callSecs=0;
+let editIdx=-1;
 
-function switchTab(tab,btn){
-  document.querySelectorAll('.login-tab').forEach(b=>b.classList.remove('on'));
+/* ──────────────────────────
+   AUTH
+────────────────────────── */
+function switchTab(t,btn){
+  document.querySelectorAll('.tabBtn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  document.getElementById('signinForm').style.display=tab==='signin'?'block':'none';
-  document.getElementById('signupForm').style.display=tab==='signup'?'block':'none';
+  document.getElementById('siF').style.display=t==='si'?'block':'none';
+  document.getElementById('suF').style.display=t==='su'?'block':'none';
 }
 
 function doEmailLogin(){
-  const email=document.getElementById('loginEmail')?.value||'admin@company.com';
-  const pass=document.getElementById('loginPass')?.value;
-  if(!email){showToast('❌ Enter email');return;}
-  if(document.getElementById('loginEmail')&&email!=='admin@company.com'){
-    showToast('❌ Wrong credentials');return;
+  const em=(document.getElementById('liE')?.value||'').trim();
+  const pw=(document.getElementById('liP')?.value||'').trim();
+  if(!em){toast('❌ Enter email');return;}
+  // simple demo auth
+  if(em==='admin@company.com'&&pw==='1234'){
+    loginOK({name:'Admin User',email:'admin@company.com',av:'A',col:'#7c3aed'});
+  } else if(em&&pw){
+    // allow any email/pass combo for demo
+    const n=em.split('@')[0].replace(/[^a-zA-Z]/g,' ').trim()||'User';
+    loginOK({name:n.charAt(0).toUpperCase()+n.slice(1),email:em,av:em[0].toUpperCase(),col:'#7c3aed'});
+  } else {
+    toast('❌ Wrong credentials');
   }
-  loginSuccess({name:'Admin User',email:'admin@company.com',avatar:'A',avatarColor:'#8B5CF6'});
 }
+function doSignUp(){
+  const n=(document.getElementById('suN')?.value||'').trim();
+  const em=(document.getElementById('suE')?.value||'').trim();
+  if(!n||!em){toast('❌ Fill all fields');return;}
+  loginOK({name:n,email:em,av:n[0].toUpperCase(),col:'#7c3aed'});
+}
+function showGPop(){document.getElementById('gPop').classList.add('show');}
+function hideGPop(){document.getElementById('gPop').classList.remove('show');}
+function gLogin(name,email,col,av){
+  if(!email){hideGPop();toast('ℹ️ Enter your Google email in sign-in form');return;}
+  hideGPop();
+  loginOK({name,email,av,col});
+}
+function doGithubLogin(){loginOK({name:'GitHub User',email:'user@github.com',av:'G',col:'#6e40c9'});}
 
-function showGooglePopup(){
-  document.getElementById('googlePopup').classList.add('show');
-}
-function hideGooglePopup(){
-  document.getElementById('googlePopup').classList.remove('show');
-}
-function googleLogin(name,email,color,initial){
-  if(name==='Use another account'){
-    showToast('ℹ️ Enter your Google email below');
-    hideGooglePopup();
-    return;
-  }
-  hideGooglePopup();
-  loginSuccess({name,email,avatar:initial,avatarColor:color});
-}
-function doGithubLogin(){
-  loginSuccess({name:'GitHub User',email:'user@github.com',avatar:'G',avatarColor:'#333'});
-}
-
-function loginSuccess(user){
-  currentUser=user;
+function loginOK(u){
+  CU=u;
+  DATA=loadUD();CLOG=loadLog();WA_COUNT=loadWACount();
   document.getElementById('loginPage').style.display='none';
   document.getElementById('appPage').style.display='block';
-  document.getElementById('sidebarAvatar').textContent=user.avatar;
-  document.getElementById('sidebarAvatar').style.background=user.avatarColor;
-  document.getElementById('sidebarName').textContent=user.name;
-  document.getElementById('sidebarEmail').textContent=user.email;
-  showToast('✅ Welcome, '+user.name+'!');
-  render();
+  document.getElementById('sbAv').textContent=u.av;
+  document.getElementById('sbAv').style.background=u.col;
+  document.getElementById('sbUN').textContent=u.name;
+  document.getElementById('sbUE').textContent=u.email;
+  toast('✅ Welcome, '+u.name+'!');
+  render();renderAna();renderLog();
 }
-
 function doLogout(){
+  CU=null;
   document.getElementById('appPage').style.display='none';
   document.getElementById('loginPage').style.display='flex';
-  showToast('👋 Signed out');
+  toast('👋 Signed out successfully');
 }
 
-function setNav(el){
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  el.classList.add('active');
+/* ──────────────────────────
+   SIDEBAR
+────────────────────────── */
+function togSB(){
+  document.getElementById('sb').classList.toggle('open');
+  document.getElementById('sbOvl').classList.toggle('show');
+}
+function showPg(pg,el){
+  document.querySelectorAll('.navI').forEach(n=>n.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.getElementById('pg-'+pg).classList.add('on');
+  if(window.innerWidth<=768)togSB();
+  if(pg==='ana')renderAna();
+  if(pg==='log')renderLog();
 }
 
-/* ── SAVE ── */
-function saveData(){localStorage.setItem('callData',JSON.stringify(data));}
+/* ──────────────────────────
+   HELPERS
+────────────────────────── */
+const COLORS=['#7c3aed','#ec4899','#06b6d4','#10b981','#f59e0b','#ef4444','#3b82f6','#14b8a6','#f97316','#a855f7'];
+function rc(i){return COLORS[i%COLORS.length];}
+function fmtTime(d){return new Date(d).toLocaleString();}
 
-/* ── RENDER ── */
-function getBadge(status){
-  const map={
-    'Called':'badge-called',
-    'Callback':'badge-callback',
-    'Busy':'badge-busy',
-    'No Answer':'badge-noanswer',
-    'Pending':'badge-pending',
-    '':'badge-pending'
-  };
-  const cls=map[status]||'badge-pending';
-  const label=status||'Pending';
-  const dot={called:'🟢',callback:'🟡',busy:'🔴',noanswer:'🟣',pending:'⚪'}[cls.replace('badge-','')]||'⚪';
-  return`<span class="badge ${cls}">${dot} ${label}</span>`;
+/* ──────────────────────────
+   STATS
+────────────────────────── */
+function updStats(){
+  document.getElementById('stT').textContent=DATA.length;
+  document.getElementById('stC').textContent=DATA.filter(r=>r.Status==='Called').length;
+  document.getElementById('stP').textContent=DATA.filter(r=>!r.Status||r.Status==='Pending').length;
+  document.getElementById('stCB').textContent=DATA.filter(r=>r.Status==='Callback').length;
+  document.getElementById('stWA').textContent=WA_COUNT;
+  document.getElementById('navB').textContent=DATA.length;
 }
 
+/* ──────────────────────────
+   RENDER TABLE
+────────────────────────── */
 function render(){
-  const search=(document.getElementById('searchBox')?.value||'').toLowerCase();
-  const filterSt=document.getElementById('filterStatus')?.value||'all';
-
-  let filtered=data.filter((r,i)=>{
-    const ms=!search||(r.Name||'').toLowerCase().includes(search)||(r.Phone||'').toLowerCase().includes(search)||(r.Info||'').toLowerCase().includes(search);
-    const mf=filterSt==='all'||r.Status===filterSt||(filterSt==='Pending'&&!r.Status);
+  const q=(document.getElementById('srch')?.value||'').toLowerCase();
+  const fs=document.getElementById('stF')?.value||'all';
+  const filtered=DATA.filter(r=>{
+    const ms=!q||(r.Name||'').toLowerCase().includes(q)||(r.Phone||'').toLowerCase().includes(q)||(r.Info||'').toLowerCase().includes(q);
+    const mf=fs==='all'||r.Status===fs||(fs==='Pending'&&!r.Status);
     return ms&&mf;
   });
-
   const tbody=document.getElementById('tbody');
   if(!filtered.length){
-    tbody.innerHTML=`<tr><td colspan="6"><div class="empty-state"><span class="empty-icon">📋</span><p>No contacts found. Import an Excel file or add manually above.</p></div></td></tr>`;
-  }else{
+    tbody.innerHTML=`<tr><td colspan="7"><div class="empty"><span class="emIco">📋</span><p>No contacts yet. Import Excel/CSV or add manually above.</p></div></td></tr>`;
+  } else {
     tbody.innerHTML=filtered.map((row,i)=>{
-      const realIdx=data.indexOf(row);
-      const init=(row.Name||'?').charAt(0).toUpperCase();
-      const colors=['#8B5CF6','#EC4899','#06B6D4','#10B981','#F59E0B','#EF4444'];
-      const col=colors[i%colors.length];
-      return`<tr>
-        <td class="td-row-num">${i+1}</td>
-        <td>
-          <div class="td-avatar">
-            <div class="av" style="background:${col}">${init}</div>
-            <div>
-              <div class="td-name">${row.Name||'—'}</div>
-            </div>
-          </div>
-        </td>
-        <td class="td-phone">${row.Phone||'—'}</td>
-        <td class="td-info" title="${row.Info||''}">${row.Info||'—'}</td>
-        <td>
-          <select class="status-sel" onchange="updateStatus(${realIdx},this.value)">
-            <option value="" ${!row.Status?'selected':''}>Pending</option>
-            <option value="Called" ${row.Status==='Called'?'selected':''}>Called</option>
-            <option value="Callback" ${row.Status==='Callback'?'selected':''}>Callback</option>
-            <option value="Busy" ${row.Status==='Busy'?'selected':''}>Busy</option>
-            <option value="No Answer" ${row.Status==='No Answer'?'selected':''}>No Answer</option>
-          </select>
-        </td>
-        <td>
-          <div style="display:flex;gap:6px;align-items:center;justify-content:center;">
-            <button class="call-row-btn" onclick="callNumber('${row.Phone}','${row.Name||'Contact'}',${realIdx})">📞 Call</button>
-            <button class="del-btn" onclick="deleteRow(${realIdx})" title="Delete">🗑</button>
-          </div>
-        </td>
+      const ri=DATA.indexOf(row);
+      const init=(row.Name||'?')[0].toUpperCase();
+      const col=rc(i);
+      const sel=SEL.has(ri);
+      const opts=['','Called','Callback','Busy','No Answer'].map(s=>`<option value="${s}" ${row.Status===s?'selected':''}>${s||'Pending'}</option>`).join('');
+      return`<tr class="${sel?'sel':''}">
+        <td class="tdNum" style="text-align:center"><input type="checkbox" ${sel?'checked':''} onchange="togSel(${ri},this)" style="accent-color:var(--pur);cursor:pointer;"></td>
+        <td class="tdNum">${i+1}</td>
+        <td><div class="tdAv"><div class="av" style="background:${col}">${init}</div><div><div class="tdN">${row.Name||'—'}</div><div class="tdP">${row.Phone||''}</div></div></div></td>
+        <td class="tdP">${row.Phone||'—'}</td>
+        <td class="tdI" title="${row.Info||''}">${row.Info||'—'}</td>
+        <td><select class="stSel" onchange="updSt(${ri},this.value)">${opts}</select></td>
+        <td><div class="rActs">
+          <button class="rBtn callBtn" onclick="callNum('${(row.Phone||'').replace(/'/g,'')}','${(row.Name||'Contact').replace(/'/g,'')}',${ri})">
+            📞 <span class="rBtnTxt">Call</span>
+          </button>
+          <button class="rBtn waBtn" onclick="sendWA('${(row.Phone||'').replace(/'/g,'')}','${(row.Name||'').replace(/'/g,'')}')" title="WhatsApp">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            <span class="rBtnTxt">WA</span>
+          </button>
+          <button class="editBtn" onclick="openEdit(${ri})" title="Edit">✏️</button>
+          <button class="delBtn" onclick="delRow(${ri})" title="Delete">🗑</button>
+        </div></td>
       </tr>`;
     }).join('');
   }
-
-  updateStats();
-  document.getElementById('tblCount').textContent=`${filtered.length} of ${data.length} contacts`;
-  document.getElementById('navCount').textContent=data.length;
-  saveData();
+  updStats();
+  document.getElementById('tCnt').textContent=`${filtered.length} of ${DATA.length} contacts`;
+  updBulk();
 }
 
-/* ── STATS ── */
-function updateStats(){
-  document.getElementById('statTotal').textContent=data.length;
-  document.getElementById('statCalled').textContent=data.filter(r=>r.Status==='Called').length;
-  document.getElementById('statPending').textContent=data.filter(r=>!r.Status||r.Status==='Pending').length;
-  document.getElementById('statCallback').textContent=data.filter(r=>r.Status==='Callback').length;
+/* ──────────────────────────
+   SELECTION
+────────────────────────── */
+function togSel(idx,cb){cb.checked?SEL.add(idx):SEL.delete(idx);updBulk();render();}
+function togAll(){
+  const c=document.getElementById('selAll').checked;
+  const q=(document.getElementById('srch')?.value||'').toLowerCase();
+  const fs=document.getElementById('stF')?.value||'all';
+  DATA.forEach((r,i)=>{
+    const ms=!q||(r.Name||'').toLowerCase().includes(q)||(r.Phone||'').toLowerCase().includes(q);
+    const mf=fs==='all'||r.Status===fs||(fs==='Pending'&&!r.Status);
+    if(ms&&mf){c?SEL.add(i):SEL.delete(i);}
+  });
+  updBulk();render();
+}
+function clrSel(){SEL.clear();document.getElementById('selAll').checked=false;updBulk();render();}
+function updBulk(){
+  const n=SEL.size;
+  document.getElementById('bulkBar').classList.toggle('show',n>0);
+  document.getElementById('bkCnt').textContent=`${n} contact${n!==1?'s':''} selected`;
+}
+function bulkSt(st){
+  SEL.forEach(i=>{if(DATA[i])DATA[i].Status=st;});
+  clrSel();saveUD();render();toast(`✅ Marked as ${st}`);
+}
+function bulkDel(){
+  if(!confirm(`Delete ${SEL.size} contacts?`))return;
+  [...SEL].sort((a,b)=>b-a).forEach(i=>DATA.splice(i,1));
+  clrSel();saveUD();render();toast('🗑 Contacts deleted');
 }
 
-/* ── ACTIONS ── */
-document.getElementById('fileInput').addEventListener('change',function(e){
-  const reader=new FileReader();
-  reader.onload=function(e){
-    try{
-      const wb=XLSX.read(e.target.result,{type:'binary'});
-      const sheet=wb.Sheets[wb.SheetNames[0]];
-      const json=XLSX.utils.sheet_to_json(sheet);
-      const imported=json.map(r=>({Name:r.Name||r.name||'',Phone:String(r.Phone||r.phone||''),Info:r.Info||r.info||r.Notes||'',Status:''}));
-      data=[...data,...imported];
-      render();
-      showToast('✅ Imported '+imported.length+' contacts');
-    }catch(err){showToast('❌ Invalid file format');}
-  };
-  reader.readAsBinaryString(e.target.files[0]);
+/* ──────────────────────────
+   IMPORT — Excel, CSV, PDF (name+phone extraction)
+────────────────────────── */
+document.getElementById('fileIn').addEventListener('change',function(e){
+  const file=e.target.files[0];
+  if(!file){return;}
+  const name=file.name.toLowerCase();
+  if(name.endsWith('.pdf')){
+    importPDF(file);
+  } else if(name.endsWith('.csv')){
+    importCSV(file);
+  } else {
+    importXL(file);
+  }
   this.value='';
 });
 
-function addManual(){
-  const n=document.getElementById('name').value.trim();
-  const p=document.getElementById('phone').value.trim();
-  const inf=document.getElementById('info').value.trim();
-  if(!p){showToast('❌ Phone number is required');return;}
-  data.push({Name:n,Phone:p,Info:inf,Status:''});
-  document.getElementById('name').value='';
-  document.getElementById('phone').value='';
-  document.getElementById('info').value='';
-  render();
-  showToast('✅ Contact added');
+function importXL(file){
+  const r=new FileReader();
+  r.onload=function(e){
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const sh=wb.Sheets[wb.SheetNames[0]];
+      const json=XLSX.utils.sheet_to_json(sh,{defval:''});
+      const imp=parseRows(json);
+      DATA=[...DATA,...imp];
+      saveUD();render();toast('✅ Imported '+imp.length+' contacts from Excel');
+    }catch(ex){toast('❌ Could not read Excel file');}
+  };
+  r.readAsBinaryString(file);
 }
 
-function updateStatus(i,val){
-  data[i].Status=val;
-  updateStats();
-  saveData();
+function importCSV(file){
+  const r=new FileReader();
+  r.onload=function(e){
+    try{
+      const lines=e.target.result.split('\n').filter(l=>l.trim());
+      if(!lines.length){toast('❌ Empty CSV');return;}
+      const headers=lines[0].split(',').map(h=>h.trim().toLowerCase().replace(/"/g,''));
+      const imp=[];
+      for(let i=1;i<lines.length;i++){
+        const cols=lines[i].split(',').map(c=>c.trim().replace(/"/g,''));
+        const obj={};
+        headers.forEach((h,j)=>obj[h]=cols[j]||'');
+        const row=parseSingleRow(obj);
+        if(row.Phone)imp.push(row);
+      }
+      DATA=[...DATA,...imp];
+      saveUD();render();toast('✅ Imported '+imp.length+' contacts from CSV');
+    }catch(ex){toast('❌ Could not read CSV file');}
+  };
+  r.readAsText(file);
 }
 
-function deleteRow(i){
+function importPDF(file){
+  // Extract numbers from PDF using text reading
+  const r=new FileReader();
+  r.onload=function(e){
+    try{
+      // Get binary string and try to find phone-like patterns
+      const text=e.target.result;
+      const phoneRegex=/(\+?[\d][\d\s\-().]{7,15}[\d])/g;
+      const nameRegex=/([A-Z][a-z]+ [A-Z][a-z]+)/g;
+      const phones=[...text.matchAll(phoneRegex)].map(m=>m[1].replace(/[\s\-().]/g,''));
+      const names=[...text.matchAll(nameRegex)].map(m=>m[1]);
+      const validPhones=[...new Set(phones.filter(p=>p.length>=7&&p.length<=15))];
+      if(!validPhones.length){toast('⚠️ No phone numbers found in PDF. Add manually.');return;}
+      const imp=validPhones.map((ph,i)=>({Name:names[i]||'',Phone:ph,Info:'From PDF',Status:''}));
+      DATA=[...DATA,...imp];
+      saveUD();render();toast('✅ Extracted '+imp.length+' numbers from PDF');
+    }catch(ex){toast('⚠️ Could not parse PDF. Try Excel/CSV instead.');}
+  };
+  r.readAsBinaryString(file);
+}
+
+function parseRows(json){
+  return json.map(r=>parseSingleRow(r)).filter(r=>r.Phone);
+}
+function parseSingleRow(r){
+  // Accept many column name variations
+  const name=r.Name||r.name||r.NAME||r['Customer Name']||r['Full Name']||r['Contact Name']||r.customer||r.Client||r['First Name']||'';
+  const raw=r.Phone||r.phone||r.PHONE||r.Mobile||r.mobile||r.MOBILE||r.Number||r.number||r['Phone Number']||r['Mobile Number']||r['Contact']||'';
+  const phone=String(raw).replace(/\D/g,'').slice(-10);// keep last 10 digits
+  const info=r.Info||r.info||r.Notes||r.notes||r.Description||r.Address||r.City||'';
+  const status=r.Status||r.status||'';
+  return{Name:String(name).trim(),Phone:phone,Info:String(info).trim(),Status:String(status).trim()};
+}
+
+/* ──────────────────────────
+   ADD MANUAL
+────────────────────────── */
+function addRow(){
+  const n=document.getElementById('fN').value.trim();
+  const p=document.getElementById('fPh').value.trim().replace(/\D/g,'');
+  const inf=document.getElementById('fIn').value.trim();
+  if(!p){toast('❌ Phone number required');return;}
+  DATA.push({Name:n,Phone:p,Info:inf,Status:''});
+  document.getElementById('fN').value='';
+  document.getElementById('fPh').value='';
+  document.getElementById('fIn').value='';
+  saveUD();render();toast('✅ Contact added');
+}
+
+function updSt(i,val){DATA[i].Status=val;updStats();saveUD();}
+function delRow(i){
   if(!confirm('Delete this contact?'))return;
-  data.splice(i,1);
-  render();
-  showToast('🗑 Contact deleted');
+  DATA.splice(i,1);saveUD();render();toast('🗑 Deleted');
 }
 
-function callNumber(phone,name,idx){
-  currentCallName=name||phone;
-  document.getElementById('bannerName').textContent='Calling: '+currentCallName;
-  document.getElementById('bannerPhone').textContent=phone;
-  document.getElementById('callBanner').classList.add('show');
-  if(idx!==undefined) data[idx].Status='Called';
-  render();
+/* ──────────────────────────
+   EDIT MODAL
+────────────────────────── */
+function openEdit(i){
+  editIdx=i;const r=DATA[i];
+  document.getElementById('eN').value=r.Name||'';
+  document.getElementById('ePh').value=r.Phone||'';
+  document.getElementById('eIn').value=r.Info||'';
+  document.getElementById('eSt').value=r.Status||'';
+  document.getElementById('editModal').classList.add('show');
+}
+function closeEdit(){document.getElementById('editModal').classList.remove('show');editIdx=-1;}
+function saveEdit(){
+  if(editIdx<0)return;
+  DATA[editIdx]={
+    Name:document.getElementById('eN').value.trim(),
+    Phone:document.getElementById('ePh').value.trim().replace(/\D/g,''),
+    Info:document.getElementById('eIn').value.trim(),
+    Status:document.getElementById('eSt').value
+  };
+  closeEdit();saveUD();render();toast('✅ Contact updated');
+}
+document.getElementById('editModal').addEventListener('click',function(e){if(e.target===this)closeEdit();});
+
+/* ──────────────────────────
+   CALL + TIMER
+────────────────────────── */
+function callNum(phone,name,idx){
+  if(!phone){toast('❌ No phone number');return;}
+  startTimer(name,phone);
+  if(idx!==undefined&&DATA[idx])DATA[idx].Status='Called';
+  addLog(name,phone,'Called');
+  saveUD();render();
   window.location.href='tel:'+phone;
 }
-
-function disconnectCall(){
+function startTimer(name,phone){
+  clearInterval(callTmrInt);callSecs=0;
+  document.getElementById('cbN').textContent='Calling: '+name;
+  document.getElementById('cbP').textContent=phone;
+  document.getElementById('cbT').textContent='0:00';
+  document.getElementById('callBanner').classList.add('show');
+  callTmrInt=setInterval(()=>{
+    callSecs++;
+    const m=Math.floor(callSecs/60),s=callSecs%60;
+    document.getElementById('cbT').textContent=m+':'+(s<10?'0':'')+s;
+  },1000);
+}
+function endCall(){
+  clearInterval(callTmrInt);
   document.getElementById('callBanner').classList.remove('show');
-  showToast('📴 Call ended');
+  toast('📴 Call ended ('+document.getElementById('cbT').textContent+')');
 }
 
-/* ── AUTO CALL ── */
-function startAutoCall(){
-  if(!data.length){showToast('❌ No contacts to call');return;}
-  const uncalled=data.filter(r=>!r.Status||r.Status==='Pending');
-  if(!uncalled.length){showToast('✅ All contacts already called');return;}
-  autoRunning=true;
-  autoIndex=0;
-  document.getElementById('autoProgress').classList.add('show');
-  showToast('▶ Auto-call started');
+/* ──────────────────────────
+   WHATSAPP
+────────────────────────── */
+function sendWA(phone,name){
+  if(!phone){toast('❌ No phone number');return;}
+  const msgEl=document.getElementById('waMsg');
+  const msg=msgEl?.value||'Hello '+name+', I am calling regarding your enquiry.';
+  const clean=phone.replace(/\D/g,'');
+  const num=clean.length===10?'91'+clean:clean;
+  const url='https://wa.me/'+num+'?text='+encodeURIComponent(msg);
+  window.open(url,'_blank');
+  WA_COUNT++;saveWA();updStats();
+  addLog(name,phone,'WhatsApp');saveLog();renderLog();
+  toast('💬 Opening WhatsApp for '+name);
+}
+function bulkWA(){
+  if(!SEL.size){toast('⚠️ Select contacts first (use checkboxes)');return;}
+  const msg=document.getElementById('waMsg')?.value||'Hello, we are contacting you regarding your enquiry.';
+  let count=0;
+  SEL.forEach(i=>{
+    if(DATA[i]&&DATA[i].Phone){
+      setTimeout(()=>{
+        const clean=DATA[i].Phone.replace(/\D/g,'');
+        const num=clean.length===10?'91'+clean:clean;
+        window.open('https://wa.me/'+num+'?text='+encodeURIComponent(msg),'_blank');
+        WA_COUNT++;
+      },count*800);
+      count++;
+    }
+  });
+  saveWA();updStats();toast('💬 Opening WhatsApp for '+SEL.size+' contacts...');
+}
+function bulkWASel(){bulkWA();}
+
+/* ──────────────────────────
+   AUTO CALL
+────────────────────────── */
+function startAuto(){
+  const pending=DATA.filter(r=>!r.Status||r.Status==='Pending');
+  if(!pending.length){toast('✅ All contacts already called');return;}
+  autoRunning=true;autoIdx=0;
+  document.getElementById('autoProg').classList.add('show');
+  toast('▶ Auto-call started — '+pending.length+' contacts');
   runAuto();
 }
-
 function runAuto(){
   if(!autoRunning)return;
-  const uncalled=data.reduce((acc,r,i)=>{if(!r.Status||r.Status==='Pending')acc.push(i);return acc;},[]);
-  if(autoIndex>=uncalled.length){
-    stopAutoCall();
-    showToast('✅ Auto-call complete!');
+  const idxs=DATA.reduce((a,r,i)=>{if(!r.Status||r.Status==='Pending')a.push(i);return a;},[]);
+  if(autoIdx>=idxs.length){stopAuto();toast('✅ Auto-call complete!');return;}
+  const ri=idxs[autoIdx];const row=DATA[ri];
+  const pct=Math.round(autoIdx/idxs.length*100);
+  document.getElementById('progBar').style.width=pct+'%';
+  document.getElementById('progInfo').textContent='Calling: '+(row.Name||row.Phone);
+  document.getElementById('progCnt').textContent=`${autoIdx+1}/${idxs.length}`;
+  callNum(row.Phone,row.Name,ri);
+  autoIdx++;
+  autoTmr=setTimeout(runAuto,parseInt(document.getElementById('delSel').value));
+}
+function stopAuto(){
+  autoRunning=false;clearTimeout(autoTmr);
+  document.getElementById('autoProg').classList.remove('show');
+  document.getElementById('progBar').style.width='0%';
+  endCall();toast('⏹ Auto-call stopped');
+}
+
+/* ──────────────────────────
+   EXPORT
+────────────────────────── */
+function exportXL(){
+  if(!DATA.length){toast('❌ No data to export');return;}
+  const ws=XLSX.utils.json_to_sheet(DATA.map(r=>({Name:r.Name,Phone:r.Phone,Notes:r.Info,Status:r.Status||'Pending'})));
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,'Contacts');
+  XLSX.writeFile(wb,'Contacts_'+CU.email.split('@')[0]+'_'+new Date().toISOString().slice(0,10)+'.xlsx');
+  toast('📥 Exported successfully');
+}
+
+/* ──────────────────────────
+   CALL LOG
+────────────────────────── */
+function addLog(name,phone,action){
+  CLOG.push({name,phone,action,time:new Date().toISOString()});
+  if(CLOG.length>200)CLOG=CLOG.slice(-200);
+  saveLog();
+}
+function renderLog(){
+  const body=document.getElementById('logBody');
+  if(!CLOG.length){
+    body.innerHTML=`<tr><td colspan="5"><div class="empty"><span class="emIco">📞</span><p>No activity yet</p></div></td></tr>`;
     return;
   }
-  const realIdx=uncalled[autoIndex];
-  const row=data[realIdx];
-  const pct=Math.round((autoIndex/uncalled.length)*100);
-  document.getElementById('progressBar').style.width=pct+'%';
-  document.getElementById('autoInfo').textContent='Auto-calling: '+( row.Name||row.Phone);
-  document.getElementById('autoCountInfo').textContent=`${autoIndex+1}/${uncalled.length}`;
-  callNumber(row.Phone,row.Name,realIdx);
-  autoIndex++;
-  autoTimer=setTimeout(runAuto,parseInt(document.getElementById('delay').value));
+  body.innerHTML=[...CLOG].reverse().map((l,i)=>{
+    const color=l.action==='Called'?'#10b981':l.action==='WhatsApp'?'#25d366':'#f59e0b';
+    return`<tr>
+      <td class="tdNum">${i+1}</td>
+      <td class="tdN">${l.name||'—'}</td>
+      <td class="tdP">${l.phone||'—'}</td>
+      <td><span style="color:${color};font-weight:800;font-size:11px">${l.action==='WhatsApp'?'💬 WhatsApp':l.action==='Called'?'📞 Called':'🔄 '+l.action}</span></td>
+      <td class="tdP">${fmtTime(l.time)}</td>
+    </tr>`;
+  }).join('');
 }
 
-function stopAutoCall(){
-  autoRunning=false;
-  clearTimeout(autoTimer);
-  document.getElementById('autoProgress').classList.remove('show');
-  document.getElementById('callBanner').classList.remove('show');
-  document.getElementById('progressBar').style.width='0%';
-  showToast('⏹ Auto-call stopped');
+/* ──────────────────────────
+   ANALYTICS
+────────────────────────── */
+function renderAna(){
+  const tot=DATA.length||1;
+  const called=DATA.filter(r=>r.Status==='Called').length;
+  const pending=DATA.filter(r=>!r.Status||r.Status==='Pending').length;
+  const cb=DATA.filter(r=>r.Status==='Callback').length;
+  const busy=DATA.filter(r=>r.Status==='Busy').length;
+  const na=DATA.filter(r=>r.Status==='No Answer').length;
+  const stats=[
+    {l:'Called',n:called,c:'#10b981'},
+    {l:'Pending',n:pending,c:'#6b6490'},
+    {l:'Callback',n:cb,c:'#f59e0b'},
+    {l:'Busy',n:busy,c:'#ef4444'},
+    {l:'No Answer',n:na,c:'#8b5cf6'},
+  ];
+
+  // donut
+  const R=42,cx=52,cy=52,circ=2*Math.PI*R;
+  let off=0;
+  const segs=stats.map(s=>{
+    const pct=s.n/tot;const d=pct*circ;
+    const seg=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${s.c}" stroke-width="13" stroke-dasharray="${d} ${circ-d}" stroke-dashoffset="${-off}" transform="rotate(-90 ${cx} ${cy})" opacity=".85"/>`;
+    off+=d;return seg;
+  }).join('');
+
+  const recent=[...CLOG].reverse().slice(0,6);
+  const logHTML=recent.length?recent.map(l=>`
+    <div class="tlItem">
+      <div class="tlDot" style="background:${l.action==='Called'?'#10b981':l.action==='WhatsApp'?'#25d366':'#f59e0b'}"></div>
+      <div><div class="tlNm">${l.name||l.phone}</div><div class="tlTm">${fmtTime(l.time)}</div></div>
+      <span class="tlSt" style="color:${l.action==='Called'?'#10b981':l.action==='WhatsApp'?'#25d366':'#f59e0b'}">${l.action==='WhatsApp'?'💬 WA':'📞 Call'}</span>
+    </div>`).join(''):'<div class="empty" style="padding:20px"><span class="emIco" style="font-size:28px">📞</span><p>No calls or WhatsApp messages yet</p></div>';
+
+  document.getElementById('anaGrid').innerHTML=`
+    <div class="anaCard">
+      <div class="anaTitle">Status Breakdown</div>
+      ${stats.map(s=>`
+        <div class="bcRow">
+          <div class="bcLbl">${s.l}</div>
+          <div class="bcTrack"><div class="bcFill" style="width:${Math.round(s.n/tot*100)}%;background:${s.c}"></div></div>
+          <div class="bcPct">${s.n}</div>
+        </div>`).join('')}
+    </div>
+    <div class="anaCard">
+      <div class="anaTitle">Distribution</div>
+      <div class="donutW">
+        <svg width="104" height="104">
+          <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="13"/>
+          ${segs}
+          <text x="${cx}" y="${cy+5}" text-anchor="middle" fill="#f0edff" font-size="13" font-weight="900" font-family="Inter">${DATA.length}</text>
+        </svg>
+        <div class="donutLeg">
+          ${stats.map(s=>`<div class="dLItem"><div class="dDot" style="background:${s.c}"></div>${s.l}<span class="dPct">${s.n}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="anaCard" style="grid-column:1/-1">
+      <div class="anaTitle">Recent Activity</div>
+      ${logHTML}
+    </div>`;
 }
 
-/* ── EXPORT ── */
-function exportExcel(){
-  if(!data.length){showToast('❌ No data to export');return;}
-  const ws=XLSX.utils.json_to_sheet(data.map(r=>({Name:r.Name,Phone:r.Phone,Info:r.Info,Status:r.Status||'Pending'})));
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'Calls');
-  XLSX.writeFile(wb,'Call_Data_'+new Date().toISOString().slice(0,10)+'.xlsx');
-  showToast('📥 Exported successfully');
-}
-
-/* ── TOAST ── */
-function showToast(msg){
+/* ──────────────────────────
+   TOAST
+────────────────────────── */
+function toast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
-  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2500);
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800);
 }
 
+// Init render (empty state)
 render();
 </script>
 </body>
